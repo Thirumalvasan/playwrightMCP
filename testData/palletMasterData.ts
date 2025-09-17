@@ -4,8 +4,8 @@ export const palletMasterData = {
   // Add-pallet specific data
   addButton: 'add', // Button name for Add
   submitButton: 'submit', // Button name for Submit
-  palletIdStart: 100021, // Starting Pallet ID
-  palletIdCount: 5, // Number of Pallet IDs to add
+  palletIdStart: 9090, // Starting Pallet ID
+  palletIdCount: 3, // Number of Pallet IDs to add
   palletIdPrefix: '', // If you want a prefix for Pallet IDs
   descriptionWords: [
     'auto', 'test', 'pallet', 'entry', 'desc', 'random', 'playwright', 'mcp', 'data', 'insert'

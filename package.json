@@ -9,7 +9,11 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.55.0",
-    "@types/node": "^24.3.1",
+    "@types/mssql": "^9.1.8",
+    "@types/node": "^24.4.0",
     "playwright": "^1.55.0"
+  },
+  "dependencies": {
+    "mssql": "^11.0.1"
   }
 }
