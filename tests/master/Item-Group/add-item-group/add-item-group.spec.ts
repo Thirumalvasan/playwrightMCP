@@ -70,7 +70,8 @@ test('Add multiple Item Groups and verify record count', async ({ page }) => {
         await page.waitForTimeout(1000);
         const newRow = page.locator('table tbody tr', { hasText: names[i] });
         await expect(newRow).toBeVisible({ timeout: 5000 });
-        added = true; 
+        added = true; // Exit retry loop
+        console.log(`✅ Item Group ${names[i]} added successfully.`);
       }
     }
   }
