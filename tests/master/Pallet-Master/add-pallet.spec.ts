@@ -5,87 +5,108 @@ import { queryDb } from '../../../Database/db';
 
 // Generate random description
 function randomDescription() {
-  const words = ['auto', 'test', 'pallet', 'entry', 'desc', 'random', 'playwright', 'mcp', 'data', 'insert'];
+  const words = [
+    'auto', 'test', 'pallet', 'entry', 'desc', 'random',
+    'playwright', 'mcp', 'data', 'insert'
+  ];
   return Array.from({ length: 3 }, () => words[Math.floor(Math.random() * words.length)]).join(' ');
 }
 
 test('add multiple pallets in Pallet Master and validate DB insert', async ({ page }) => {
-  // 1) Navigate to login page
+  test.setTimeout(60000); // Increase timeout to 60 seconds
+  // Login
   await page.goto(loginData.baseUrl + 'auth/login');
-
-  // 2) Enter the username
   await page.getByRole('textbox', { name: 'Enter Username' }).fill(loginData.username);
-
-  // 3) Enter the password
   await page.getByRole('textbox', { name: 'Enter Password' }).fill(loginData.password);
-
-  // 4) Click the login button
   await page.getByRole('button', { name: /Log In/i }).click();
-
-  // 5) Verify login success
   await page.waitForURL(loginData.baseUrl);
   await expect(page).toHaveURL(loginData.baseUrl);
 
-  // 6) Navigate to Pallet Master
+  // Navigate to Pallet Master
   await page.getByRole('link', { name: /master/i }).click();
   await page.waitForTimeout(500);
   await page.getByRole('link', { name: /Pallet Master/i }).click();
 
   for (let i = 0; i < palletMasterData.palletIdCount; i++) {
-    // 1) Click Add button
+    // Click Add button
     await page.getByRole('button', { name: new RegExp(palletMasterData.addButton, 'i') }).click();
 
-    // 2) Check the url
+    // Verify URL
     await page.waitForURL(loginData.baseUrl + 'master/palletmaster');
     await expect(page).toHaveURL(loginData.baseUrl + 'master/palletmaster');
 
-    // 3) Pallet Id
+    // Fill PalletId input
     const palletId = `${palletMasterData.palletIdPrefix}${palletMasterData.palletIdStart + i}`;
     const palletIdInput = page.locator('label.form-label', { hasText: palletMasterData.palletIdLabel }).locator('xpath=following-sibling::input');
     await palletIdInput.first().waitFor({ state: 'visible', timeout: 10000 });
     await palletIdInput.first().fill(palletId);
 
-    // 4) Description
+    // Fill Description
     const descInput = page.locator('label.form-label', { hasText: palletMasterData.descriptionLabel }).locator('xpath=following-sibling::textarea');
     await descInput.first().waitFor({ state: 'visible', timeout: 10000 });
     const description = randomDescription();
     await descInput.first().fill(description);
 
-    // 5) Submit
+    // Click Submit
     await page.getByRole('button', { name: new RegExp(palletMasterData.submitButton, 'i') }).click();
 
-    // 6) Handle duplicate pop-up
     let handledPopup = false;
+
+    // Check for duplicate pallet popup within 3 seconds
     try {
       const errorPopup = page.locator(`div.modal-body:has-text("${palletMasterData.errorPopupText}")`);
       await errorPopup.waitFor({ state: 'visible', timeout: 3000 });
 
-      const okBtn = errorPopup.locator('button.swal2-cancel, button.btn-primary');
+      // Duplicate popup appeared - click OK and skip DB check
+      const okBtn = errorPopup.getByRole('button', { name: /^ok$/i });
       if (await okBtn.isVisible()) {
         await okBtn.click();
         handledPopup = true;
+        await expect(errorPopup).toBeHidden({ timeout: 3000 });
         console.log(`❌ Pallet ID ${palletId} already exists. Skipping DB check.`);
+      } else {
+        console.log('⚠️ Duplicate popup OK button not found. Will attempt DB check.');
       }
+
       await page.waitForTimeout(1000);
     } catch {
-      await page.waitForTimeout(1000);
+      // No duplicate popup detected
+      console.log(`✔️ Duplicate popup not found for Pallet ID ${palletId}. Will check DB.`);
     }
 
-    // 7) Verify backend DB only if not duplicate
     if (!handledPopup) {
-      const rows = await queryDb(
-        `SELECT TOP 1 PalletId, Description 
-         FROM Pallet_Master 
-         WHERE PalletId = '${palletId}' 
-         ORDER BY CreatedDate DESC`
-      );
+      // Retry DB check up to 4 times in case of slight delay
+      let foundInDb = false;
+      let attempts = 0;
+      let rows;
 
-      expect(rows.length).toBeGreaterThan(0);
-      expect(rows[0].PalletId).toBe(palletId);
-      console.log(`✅ Pallet ID ${palletId} inserted successfully in DB.`);
+      while (!foundInDb && attempts < 4) {
+        rows = await queryDb(
+          `SELECT TOP 1 PalletId, Description 
+           FROM Master_Pallet 
+           WHERE PalletId = '${palletId}' 
+           ORDER BY UpdateDateTime DESC`
+        );
+
+        foundInDb = rows.length > 0;
+        console.log(`[DEBUG] DB check attempt ${attempts + 1} - found rows: ${rows.length}`);
+
+        if (!foundInDb) {
+          await new Promise(r => setTimeout(r, 2000)); // Wait 2 seconds before retrying
+        }
+        attempts++;
+      }
+
+      expect(foundInDb).toBe(true);
+      if (foundInDb) {
+        expect(rows[0].PalletId).toBe(palletId);
+        console.log(`✅ Pallet ID ${palletId} inserted successfully into DB.`);
+      } else {
+        console.error(`❌ Pallet ID ${palletId} NOT found in DB after submit.`);
+      }
     }
 
-    // 8) Reset back to list
+    // Reload Pallet Master list page for the next iteration
     await page.goto(loginData.baseUrl + 'master/palletmaster');
     await page.waitForTimeout(500);
   }

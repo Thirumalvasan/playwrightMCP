@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loginData } from '../../../../testData/loginData';
 import { itemGroupData } from '../../../../testData/ItemGroupData';
+import { queryDb } from '../../../../Database/db';
 
 
 test('Add multiple Item Groups and verify record count', async ({ page }) => {
@@ -24,7 +25,7 @@ test('Add multiple Item Groups and verify record count', async ({ page }) => {
   for (let i = 0; i < itemGroupData.itemgroupcount; i++) {
     let added = false;
     let attempts = 0;
-    while (!added && attempts < 2) {
+    while (!added && attempts < 1) {
       // Click Add button
       await page.getByRole('button', { name: new RegExp(itemGroupData.addButton, 'i') }).click();
       await page.waitForURL(/itemgroup/i);
@@ -97,5 +98,6 @@ test('Add multiple Item Groups and verify record count', async ({ page }) => {
   const countLabel = page.locator('label.form-label.text-primary.fw-bold.mx-2');
   const countText = await countLabel.textContent();
   expect(Number(countText)).toBeGreaterThan(0);
+
 });
 

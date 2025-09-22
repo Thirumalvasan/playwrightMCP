@@ -21,6 +21,7 @@ test('pallet master export PDF, Excel, CSV', async ({ page }) => {
   await page.waitForURL(palletMasterData.baseUrl);
   await expect(page).toHaveURL(palletMasterData.baseUrl);
 
+
   // 6) Click the master menu dropdown and select pallet master
   await page.getByRole('link', { name: /master/i }).click();
   await page.waitForTimeout(500);
@@ -32,28 +33,23 @@ test('pallet master export PDF, Excel, CSV', async ({ page }) => {
 
   // 8) Click the export button
   const exportBtn = page.locator('button#dropdownMenuButton2.btn-outline-primary');
-  await exportBtn.click();
-  await page.waitForTimeout(500);
+  async function downloadFile(buttonText: string, fileExtension: string) {
+    await exportBtn.click();
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.locator('a.dropdown-item', { hasText: buttonText }).click(),
+    ]);
+    const filePath = `./Downloads/PalletMaster_${Date.now()}.${fileExtension}`;
+    await download.saveAs(filePath);
+    console.log(`${buttonText} downloaded at:`, filePath);
+  }
 
-  // 9) Click the PDF option
-  const pdfBtn = page.locator('a.dropdown-item', { hasText: 'PDF' });
-  await pdfBtn.click();
-  await page.waitForTimeout(1000);
+  await downloadFile('EXCEL', 'xlsx');
 
-  // 10) Click the export button again for Excel
-  await exportBtn.click();
-  await page.waitForTimeout(500);
-  const excelBtn = page.locator('a.dropdown-item', { hasText: 'EXCEL' });
-  await excelBtn.click();
-  await page.waitForTimeout(1000);
+  await downloadFile('CSV', 'csv');
 
-  // 11) Click the export button again for CSV
-  await exportBtn.click();
-  await page.waitForTimeout(500);
-  const csvBtn = page.locator('a.dropdown-item', { hasText: 'CSV' });
-  await csvBtn.click();
-  await page.waitForTimeout(1000);
+  await downloadFile('PDF', 'pdf');
 
-  // 12) Show the screen for 1 minute
-  await page.waitForTimeout(40000);
+  // Optional: wait to ensure all downloads complete
+  await page.waitForTimeout(2000);
 });

@@ -53,6 +53,11 @@ test('edit pallet record for sno 1', async ({ page }) => {
   // 13) Assert that the updated value is displayed on the screen for up to 30 seconds
   await page.waitForTimeout(1000); // wait for navigation or reload if needed
   await page.goto(loginData.baseUrl + 'master/palletmaster');
+  await page.waitForTimeout(1000); // wait for table to load
+
+  const table = page.locator('table');
+  await expect(table).toBeVisible();  
+  
   // Wait for the updated row to appear (customize selector as needed)
   // const updatedRow = page.locator('table tbody tr', { hasText: '10' });
   // await expect(updatedRow).toContainText(['10', 'hello'], { timeout: 30000 });
