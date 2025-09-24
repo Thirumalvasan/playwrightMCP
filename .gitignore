@@ -7,3 +7,6 @@ node_modules/
 /playwright/.cache/
 .vs/
 *.vsidx
+
+# Playwright
+/playwright/.auth/

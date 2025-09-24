@@ -3,8 +3,8 @@ import sql from "mssql";
 const config = {
   user: "sa",
   password: "ca123",
-  database: "ASRS_Milkymist_05-09-2025",
-  server: "192.168.221.43",
+  database: "ASRS_Milkymist",
+  server: "192.168.221.43", // 
   options: {
     encrypt: false, // true if using Azure or SSL
     trustServerCertificate: true
