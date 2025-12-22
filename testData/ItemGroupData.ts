@@ -1,4 +1,3 @@
-import { loginData } from "./loginData";
 export const itemGroupData = {
 
   addButton: 'add',
@@ -22,5 +21,8 @@ export const itemGroupData = {
   verifyButton: 'Verify & Confirm',
   importButton: 'Import',
   exportButton: 'Export',
+
+  deactiveitem:'Cake',
+  activeitem:'White Cake'
 
 }

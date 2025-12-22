@@ -1,7 +1,7 @@
 // @ts-ignore
 import { test, expect } from '@playwright/test';
 import { loginData } from '../../../testData/loginData';
-import { palletMasterData } from '../../../testData/palletMasterData';
+//import { palletMasterData } from '../../../testData/palletMasterData';
 
 test('edit pallet record for sno 1', async ({ page }) => {
   // 1) Navigate to login page

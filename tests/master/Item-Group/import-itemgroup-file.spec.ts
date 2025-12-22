@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 import {loginData} from '../../../testData/loginData';
-import {itemGroupData} from '../../../testData/ItemGroupData';
+//import {itemGroupData} from '../../../testData/ItemGroupData';
 import * as path from 'path';
 
 test('import itemgroup file and verify import', async ({page}) => {

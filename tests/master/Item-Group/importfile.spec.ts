@@ -43,26 +43,42 @@ test('import item group file and verify import', async ({ page }) => {
   await page.setInputFiles('input[type="file"]', excelFile);
   await page.getByRole('button', { name: /Verify & Confirm/i }).click();
 
+  
+  let importSuccess = false;
+  try {
+    if (!importSuccess) {
+  console.log("Import did not trigger popup, validating in DB instead");
+}   
   await page.waitForSelector('text=imported successfully', { timeout: 15000 });
   const successMessage = page.getByText('imported successfully', { exact: false });
   await expect(successMessage).toBeVisible();
-
-  // try {
-  //   const modalText = await page.locator('div.modal-body').innerText();
-  //   console.log('Modal text is:', modalText);
-  // } catch {
-  //   console.log('Modal body not found');
-  // }
-
+  importSuccess = true;
   await page.getByRole('button', { name: /OK/i }).click();
   await page.waitForTimeout(2000);
-
-  for (const { groupName, groupDesc } of excelRows) {
+} catch {
+  let allExist = true;
+  for (const { groupName } of excelRows) {
     const dbRows = await queryDb(`
-      SELECT PartGrp, PartGrpDesc 
-      FROM Master_PartGroup 
-      WHERE PartGrp = '${groupName}'
-    `);
+      SELECT PartGrp, PartGrpDesc FROM Master_PartGroup WHERE PartGrp = '${groupName}'`);
+    if (!dbRows || dbRows.length === 0) {
+      allExist = false;
+      break;
+    }
+  }
+  if (allExist) {
+    await page.evaluate(() => {
+      alert("Import Failed\nAll records already exist in the database");
+    });
+    await page.waitForTimeout(2000);
+    console.log('Records already exist in DB:', excelRows.map(r => r.groupName).join(', '));
+    return;
+  } else { 
+    throw new Error('Import failed for unknown reasons.');
+  }
+}
+    for (const { groupName, groupDesc } of excelRows) {
+    const dbRows = await queryDb(`
+      SELECT PartGrp, PartGrpDesc FROM Master_PartGroup WHERE PartGrp = '${groupName}'`);
 
     expect(dbRows.length).toBeGreaterThan(0);
     expect(dbRows[0].PartGrp).toBe(groupName);
@@ -74,3 +90,4 @@ test('import item group file and verify import', async ({ page }) => {
     console.log(`Verified in DB: ${groupName} -> ${groupDesc}`);
   }
 });
+

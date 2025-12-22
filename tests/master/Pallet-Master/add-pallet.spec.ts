@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { loginData } from '../../../testData/loginData';
 import { palletMasterData } from '../../../testData/palletMasterData';
 import { queryDb } from '../../../Database/db';
+import '../../setup';
 
 // Generate random description
 function randomDescription() {
@@ -11,6 +12,8 @@ function randomDescription() {
   ];
   return Array.from({ length: 3 }, () => words[Math.floor(Math.random() * words.length)]).join(' ');
 }
+
+//test('add multiple pallets in Pallet Master and validate DB insert', async ({ page }) => {
 
 test('add multiple pallets in Pallet Master and validate DB insert', async ({ page }) => {
   test.setTimeout(60000); // Increase timeout to 60 seconds
@@ -31,8 +34,8 @@ test('add multiple pallets in Pallet Master and validate DB insert', async ({ pa
     // Click Add button
     await page.getByRole('button', { name: new RegExp(palletMasterData.addButton, 'i') }).click();
 
-    // Verify URL
-    await page.waitForURL(loginData.baseUrl + 'master/palletmaster');
+    // Wait for navigation and verify URL
+    await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(loginData.baseUrl + 'master/palletmaster');
 
     // Fill PalletId input
@@ -78,18 +81,23 @@ test('add multiple pallets in Pallet Master and validate DB insert', async ({ pa
       // Retry DB check up to 4 times in case of slight delay
       let foundInDb = false;
       let attempts = 0;
-      let rows;
+      let rows: any[] = [];
 
       while (!foundInDb && attempts < 4) {
-        rows = await queryDb(
-          `SELECT TOP 1 PalletId, Description 
-           FROM Master_Pallet 
-           WHERE PalletId = '${palletId}' 
-           ORDER BY UpdateDateTime DESC`
-        );
+        try {
+          rows = await queryDb(
+            `SELECT TOP 1 PalletId, Description 
+             FROM Master_Pallet 
+             WHERE PalletId = '${palletId}' 
+             ORDER BY UpdateDateTime DESC`
+          );
+        } catch (error) {
+          console.error(`[ERROR] DB query failed on attempt ${attempts + 1}:`, error);
+          rows = [];
+        }
 
-        foundInDb = rows.length > 0;
-        console.log(`[DEBUG] DB check attempt ${attempts + 1} - found rows: ${rows.length}`);
+        foundInDb = rows && rows.length > 0;
+        console.log(`[DEBUG] DB check attempt ${attempts + 1} - found rows: ${rows ? rows.length : 0}`);
 
         if (!foundInDb) {
           await new Promise(r => setTimeout(r, 2000)); // Wait 2 seconds before retrying
@@ -98,7 +106,7 @@ test('add multiple pallets in Pallet Master and validate DB insert', async ({ pa
       }
 
       expect(foundInDb).toBe(true);
-      if (foundInDb) {
+      if (foundInDb && rows && rows.length > 0) {
         expect(rows[0].PalletId).toBe(palletId);
         console.log(`✅ Pallet ID ${palletId} inserted successfully into DB.`);
       } else {
@@ -110,4 +118,4 @@ test('add multiple pallets in Pallet Master and validate DB insert', async ({ pa
     await page.goto(loginData.baseUrl + 'master/palletmaster');
     await page.waitForTimeout(500);
   }
-}, 120000);
+});

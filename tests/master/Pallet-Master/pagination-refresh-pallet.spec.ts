@@ -3,10 +3,6 @@ import { test, expect } from '@playwright/test';
 import { loginData } from '../../../testData/loginData';
 import { palletMasterData } from '../../../testData/palletMasterData';
 
-function getTimeString(date: Date) {
-  // Format as HH:mm or similar, adjust as needed for your UI
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
 
 test('pallet master pagination and refresh tests', async ({ page }) => {
   test.setTimeout(70000); // Increase timeout for long waits

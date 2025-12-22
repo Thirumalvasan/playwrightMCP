@@ -1,7 +1,7 @@
 import {test, expect} from '@playwright/test';
 import {loginData} from '../../../testData/loginData';
 import {itemGroupData} from '../../../testData/ItemGroupData'
-import {queryDb} from '../../../Database/db';
+//import {queryDb} from '../../../Database/db';
 
 test('Edit an Item Group and verify the update', async ({page}) => {
 

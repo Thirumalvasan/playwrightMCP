@@ -1,12 +1,11 @@
 import sql from "mssql";
-// db.ts
 const config = {
   user: "sa",
   password: "ca123",
   database: "ASRS_Milkymist",
-  server: "192.168.221.43", // 
+  server: "192.168.221.31",
   options: {
-    encrypt: false, // true if using Azure or SSL
+    encrypt: false, 
     trustServerCertificate: true
   }
 };
