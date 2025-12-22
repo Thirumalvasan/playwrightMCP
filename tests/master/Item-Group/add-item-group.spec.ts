@@ -100,4 +100,3 @@ test('Add multiple Item Groups and verify record count', async ({ page }) => {
   expect(Number(countText)).toBeGreaterThan(0);
 
 });
-
