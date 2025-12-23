@@ -27,8 +27,8 @@
       "@pages/*": ["pages/*"],
       "@tests/*": ["tests/*"],
       "@utils/*": ["utils/*"],
-      "@data/*": ["data/*"],
-      "@config/*": ["config/*"]
+      "@testData/*": ["testData/*"],
+      "@configs/*": ["configs/*"]
     },
     "types": ["@playwright/test", "node"]
   },
