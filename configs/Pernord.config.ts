@@ -8,7 +8,6 @@ export const PernordConfig = {
     firstTimePassword: 'TempPass@123'
   },
   database: {
-    // Project 2 database config
     server: '192.168.221.55',
     database: 'WMS_Pernord'
   }

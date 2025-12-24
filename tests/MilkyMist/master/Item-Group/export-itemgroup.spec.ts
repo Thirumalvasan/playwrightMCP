@@ -36,4 +36,3 @@ test('item group export Excel, CSV, PDF', async ({ page }) => {
   
   await page.waitForTimeout(2000);
 });
-

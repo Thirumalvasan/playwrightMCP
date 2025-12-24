@@ -8,14 +8,12 @@
     "install:browsers:chrome": "npx playwright install chrome",
     "install:browsers:firefox": "npx playwright install firefox",
     "install:browsers:webkit": "npx playwright install webkit",
-    
     "test": "echo 'Please specify a project. Use: npm run test:milkymist or npm run test:pernord'",
     "test:ui": "echo 'Please specify a project. Use: npm run test:milkymist:ui or npm run test:pernord:ui'",
     "test:all": "npm run test:milkymist && npm run test:pernord",
     "test:all:parallel": "concurrently \"npm run test:milkymist\" \"npm run test:pernord\"",
     "test:report": "npx playwright show-report playwright-report",
     "test:codegen": "npx playwright codegen",
-    
     "test:milkymist": "PLAYWRIGHT_PROJECT=milkymist npx playwright test --project=milkymist-chrome",
     "test:milkymist:all": "PLAYWRIGHT_PROJECT=milkymist npx playwright test tests/milkymist",
     "test:milkymist:ui": "PLAYWRIGHT_PROJECT=milkymist npx playwright test --ui",
@@ -26,11 +24,8 @@
     "test:milkymist:firefox": "PLAYWRIGHT_PROJECT=milkymist npx playwright test --project=milkymist-firefox",
     "test:milkymist:headed": "PLAYWRIGHT_PROJECT=milkymist npx playwright test --headed",
     "test:milkymist:debug": "PLAYWRIGHT_PROJECT=milkymist npx playwright test --debug",
-    
     "test:milkymist:login-spec": "PLAYWRIGHT_PROJECT=milkymist npx playwright test tests/milkymist/login/login.spec.ts",
     "test:milkymist:changepassword-spec": "PLAYWRIGHT_PROJECT=milkymist npx playwright test tests/milkymist/login/changepassword.spec.ts",
-    
-  
     "test:pernord": "PLAYWRIGHT_PROJECT=pernord npx playwright test --project=pernord-chrome",
     "test:pernord:all": "PLAYWRIGHT_PROJECT=pernord npx playwright test tests/pernord",
     "test:pernord:ui": "PLAYWRIGHT_PROJECT=pernord npx playwright test --ui",
@@ -41,33 +36,31 @@
     "test:pernord:firefox": "PLAYWRIGHT_PROJECT=pernord npx playwright test --project=pernord-firefox",
     "test:pernord:headed": "PLAYWRIGHT_PROJECT=pernord npx playwright test --headed",
     "test:pernord:debug": "PLAYWRIGHT_PROJECT=pernord npx playwright test --debug",
-    
     "test:pernord:login-spec": "PLAYWRIGHT_PROJECT=pernord npx playwright test tests/pernord/login/login.spec.ts",
     "test:pernord:changepassword-spec": "PLAYWRIGHT_PROJECT=pernord npx playwright test tests/pernord/login/changepassword.spec.ts",
-    
     "test:smoke": "echo 'Please specify a project for smoke tests'",
     "test:regression": "echo 'Please specify a project for regression tests'",
     "test:milkymist:smoke": "PLAYWRIGHT_PROJECT=milkymist npx playwright test --grep @smoke",
     "test:pernord:smoke": "PLAYWRIGHT_PROJECT=pernord npx playwright test --grep @smoke",
     "test:milkymist:regression": "PLAYWRIGHT_PROJECT=milkymist npx playwright test --grep @regression",
     "test:pernord:regression": "PLAYWRIGHT_PROJECT=pernord npx playwright test --grep @regression",
-    
     "test:parallel": "echo 'Please specify a project for parallel execution'",
     "test:milkymist:parallel": "PLAYWRIGHT_PROJECT=milkymist npx playwright test --workers=4",
     "test:pernord:parallel": "PLAYWRIGHT_PROJECT=pernord npx playwright test --workers=4",
-    
     "setup": "npm install && npx playwright install",
     "clean": "rm -rf node_modules playwright-report test-results",
     "clean:reports": "rm -rf playwright-report test-results",
     "clean:cache": "rm -rf .cache .npm .playwright",
-    
     "lint": "npx tsc --noEmit",
     "type-check": "npx tsc --noEmit",
     "format": "npx prettier --write \"**/*.{ts,js,json,md}\"",
-    
     "test:config": "npx playwright test --config=playwright.config.ts --list",
     "test:projects": "echo 'Available projects: milkymist-chrome, milkymist-firefox, pernord-chrome, pernord-firefox'",
-    "help": "npm run test:projects && echo 'Use npm run <script> where script is one of the above'"
+    "help": "npm run test:projects && echo 'Use npm run <script> where script is one of the above'",
+    "dashboard": "cd web-dashboard && npm start",
+    "dashboard:dev": "cd web-dashboard && npm run dev",
+    "dashboard:install": "cd web-dashboard && npm install",
+    "ui": "npm run dashboard"
   },
   "keywords": [
     "playwright",
@@ -87,14 +80,16 @@
     "@types/node": "^24.4.0",
     "@types/xlsx": "^0.0.35",
     "playwright": "^1.55.0",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "concurrently": "^8.2.2",
+    "dotenv": "^16.3.1",
     "mssql": "^11.0.1",
     "mysql2": "^3.15.0",
-    "xlsx": "^0.18.5",
-    "concurrently": "^8.2.2",
-    "dotenv": "^16.3.1"
+    "open": "^11.0.0",
+    "xlsx": "^0.18.5"
   },
   "directories": {
     "test": "tests"
