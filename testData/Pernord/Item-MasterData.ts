@@ -1,0 +1,30 @@
+import { itemGroupData } from "@testData/ItemGroupData";
+
+export const ItemMasterData = {
+    addButton: 'add',
+    SubmitButton: 'submit',
+    itemcount: 5,
+    itemcodePrefix: 'ITEMCODE-',
+    itemnamePrefix: 'Milk Product ',
+    itemname: ['Whole Milk', 'Skimmed Milk', 'Toned Milk', 'Double Toned Milk', 'Flavored Milk'],
+    itemGroup: itemGroupData.itemgroupname[0],
+    uom: 'Liters',
+    skuPrefix: 'SKU-',
+    packagingsize: '1 Liter',
+    itemsize: 'Medium',
+    expiryDuration: '7 Days',
+    errorPopupText: 'Item already exists',
+    itemnamelabel: 'Item Name',
+    itemdesclabel: 'Item Description',
+    errorpopupOkButton: ['swal2-cancel', 'btn-primary'],
+    editItem: 'Seagram Imperial Blue 48X180',
+    editItemdesc: 'Assorted Flavored Milk',
+    sampleFile: 'tests/milkymist/master/Item-Master/sample-import.xlsx',
+    importTitle: 'IMPORT EXCEL',
+    previewTitle: 'Product List Preview Page',
+    verifyButton: 'Verify & Confirm',
+    importButton: 'Import',
+    exportButton: 'Export',
+    deactiveitem: 'Toned Milk',
+    activeitem: 'Toned Milk'
+};

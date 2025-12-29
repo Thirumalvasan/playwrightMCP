@@ -1,8 +1,9 @@
 // utils/configLoader.ts
 import { MilkyMistConfig } from '../configs/MilkyMist.config';
 import { PernordConfig } from '../configs/Pernord.config';
+import { KKPConfig } from '../configs/KKP.config';
 
-export type ProjectType = 'milkymist' | 'pernord';
+export type ProjectType = 'milkymist' | 'pernord' | 'kkp';
 
 export interface ProjectConfig {
   name: string;
@@ -25,6 +26,8 @@ export function getConfig(project: ProjectType): ProjectConfig {
       return MilkyMistConfig;
     case 'pernord':
       return PernordConfig;
+    case 'kkp':
+      return KKPConfig;
     default:
       throw new Error(`Unknown project: ${project}`);
   }
@@ -35,5 +38,5 @@ export function getCurrentProject(): ProjectType {
   const envProject = process.env.PLAYWRIGHT_PROJECT;
   
   // Default to milkymist if not specified
-  return (envProject === 'pernord' ? 'pernord' : 'milkymist') as ProjectType;
+  return (envProject === 'pernord' ? 'pernord' : (envProject === 'kkp' ? 'kkp' : 'milkymist')) as ProjectType;
 }

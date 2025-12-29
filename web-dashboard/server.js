@@ -11,7 +11,156 @@ const PORT = 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+//app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/assets', express.static(path.join(__dirname, 'public', 'assets')));
+app.use('/logos', express.static(path.join(__dirname, 'public', 'assets', 'logos')));
+
+// Function to load configs dynamically
+// function loadProjectsFromConfig() {
+//     const projects = {};
+//     const configDir = path.join(__dirname, '..', 'configs');
+    
+//     console.log(`📂 Looking for configs in: ${configDir}`);
+    
+//     // Check if config directory exists
+//     if (!fs.existsSync(configDir)) {
+//         console.log('⚠️ Configs directory not found at:', configDir);
+//         console.log('📍 Current directory:', __dirname);
+//         return {};
+//     }
+
+//     try {
+//         const configFiles = fs.readdirSync(configDir);
+//         console.log(`📄 Found config files: ${configFiles.join(', ')}`);
+        
+//         for (const file of configFiles) {
+//             if (file.endsWith('.config.ts') || file.endsWith('.config.js')) {
+//                 try {
+//                     const configPath = path.join(configDir, file);
+//                     const fileContent = fs.readFileSync(configPath, 'utf8');
+//                     const projectName = file.split('.')[0].toLowerCase();
+                    
+//                     console.log(`🔍 Processing config: ${file} -> ${projectName}`);
+                    
+//                     // Extract config using regex (simple approach for TypeScript)
+//                     let config = {};
+                    
+//                     // Try to extract the config object
+//                     const configMatch = fileContent.match(/export\s+const\s+\w+Config\s*=\s*({[\s\S]*?});/);
+//                     if (configMatch) {
+//                         try {
+//                             // Clean the string to make it valid JSON
+//                             let jsonStr = configMatch[1]
+//                                 .replace(/\/\/.*$/gm, '') // Remove comments
+//                                 .replace(/'/g, '"')       // Replace single quotes with double quotes
+//                                 .replace(/(\w+):/g, '"$1":') // Add quotes to property names
+//                                 .replace(/,\s*}/g, '}')   // Remove trailing commas
+//                                 .replace(/,\s*]/g, ']');  // Remove trailing commas in arrays
+                            
+//                             config = JSON.parse(jsonStr);
+//                         } catch (parseError) {
+//                             console.error(`❌ Error parsing JSON for ${projectName}:`, parseError.message);
+//                             // Fallback: extract individual values
+//                             const baseURLMatch = fileContent.match(/baseURL:\s*['"]([^'"]+)['"]/);
+//                             const nameMatch = fileContent.match(/name:\s*['"]([^'"]+)['"]/);
+//                             const usernameMatch = fileContent.match(/username:\s*['"]([^'"]+)['"]/);
+//                             const passwordMatch = fileContent.match(/password:\s*['"]([^'"]+)['"]/);
+                            
+//                             if (baseURLMatch) {
+//                                 config = {
+//                                     name: nameMatch ? nameMatch[1] : projectName.charAt(0).toUpperCase() + projectName.slice(1),
+//                                     baseURL: baseURLMatch[1],
+//                                     credentials: {
+//                                         username: usernameMatch ? usernameMatch[1] : 'admin',
+//                                         password: passwordMatch ? passwordMatch[1] : 'password'
+//                                     }
+//                                 };
+//                             }
+//                         }
+//                     }
+                    
+//                     if (config && config.baseURL) {
+//                         projects[projectName] = {
+//                             name: config.name || projectName.charAt(0).toUpperCase() + projectName.slice(1),
+//                             baseURL: config.baseURL,
+//                             credentials: config.credentials || {
+//                                 username: 'admin',
+//                                 password: 'password'
+//                             },
+//                             folder: projectName,
+//                             database: config.database,
+//                             firstTimeUser: config.credentials?.firstTimeUser,
+//                             firstTimePassword: config.credentials?.firstTimePassword,
+//                             configPath: configPath
+//                         };
+//                         console.log(`✅ Loaded config for: ${projectName}`);
+//                     }
+//                 } catch (error) {
+//                     console.error(`❌ Error processing ${file}:`, error.message);
+//                 }
+//             }
+//         }
+//     } catch (error) {
+//         console.error('❌ Error reading config directory:', error.message);
+//     }
+    
+//     // If no configs loaded, use fallback
+//     if (Object.keys(projects).length === 0) {
+//         console.log('⚠️ Using fallback configurations');
+//         projects['milkymist'] = {
+//             name: 'MilkyMist WMS',
+//             baseURL: 'http://localhost:8016/',
+//             credentials: {
+//                 username: 'admin',
+//                 password: 'admin123',
+//                 firstTimeUser: 'newuser',
+//                 firstTimePassword: 'TempPass@123'
+//             },
+//             folder: 'milkymist',
+//             database: {
+//                 server: 'localhost',
+//                 database: 'MilkyMist'
+//             }
+//         };
+//         projects['pernord'] = {
+//             name: 'Pernord WMS',
+//             baseURL: 'https://swtest.craftsmanautomation.com:8090/pernord-test-web/',
+//             credentials: {
+//                 username: 'admin',
+//                 password: 'sft@cal',
+//                 firstTimeUser: 'newuser',
+//                 firstTimePassword: 'TempPass@123'
+//             },
+//             folder: 'pernord',
+//             database: {
+//                 server: '192.168.221.55',
+//                 database: 'WMS_Pernord'
+//             }
+//         };
+//         projects['kkp'] = {
+//             name: 'KKP',
+//             baseURL: 'http://localhost:8016/',
+//             credentials: {
+//                 username: 'admin',
+//                 password: 'admin123',
+//                 firstTimeUser: 'newuser',
+//                 firstTimePassword: 'TempPass@123'
+//             },
+//             folder: 'kkp',
+//             database: {
+//                 server: 'localhost',
+//                 database: 'ASRS_KKP'
+//             }
+//         };
+
+//     }
+    
+//     console.log(`📊 Total projects loaded: ${Object.keys(projects).length}`);
+//     return projects;
+// }
+
+// Load projects
 
 // Function to load configs dynamically
 function loadProjectsFromConfig() {
@@ -19,92 +168,188 @@ function loadProjectsFromConfig() {
     const configDir = path.join(__dirname, '..', 'configs');
     
     console.log(`📂 Looking for configs in: ${configDir}`);
+    console.log(`📍 Current directory: ${__dirname}`);
+    console.log(`📍 Full config path: ${path.resolve(configDir)}`);
     
     // Check if config directory exists
     if (!fs.existsSync(configDir)) {
-        console.log('⚠️ Configs directory not found at:', configDir);
-        console.log('📍 Current directory:', __dirname);
+        console.log('❌ Configs directory not found at:', path.resolve(configDir));
+        console.log('📁 Available directories at parent level:');
+        const parentDir = path.join(__dirname, '..');
+        if (fs.existsSync(parentDir)) {
+            const parentContents = fs.readdirSync(parentDir);
+            console.log(parentContents.map(item => `  - ${item}`).join('\n'));
+        }
         return {};
     }
 
+    console.log(`✅ Config directory exists!`);
+    
     try {
         const configFiles = fs.readdirSync(configDir);
-        console.log(`📄 Found config files: ${configFiles.join(', ')}`);
+        console.log(`📄 Found ${configFiles.length} files:`, configFiles);
         
         for (const file of configFiles) {
-            if (file.endsWith('.config.ts') || file.endsWith('.config.js')) {
+            console.log(`\n🔍 Processing file: ${file}`);
+            
+            // Check if it's a config file
+            const isConfigFile = file.endsWith('.config.ts') || file.endsWith('.config.js');
+            console.log(`   Is config file? ${isConfigFile}`);
+            
+            if (isConfigFile) {
                 try {
                     const configPath = path.join(configDir, file);
+                    console.log(`   Config path: ${configPath}`);
+                    
+                    // Read file content
                     const fileContent = fs.readFileSync(configPath, 'utf8');
+                    console.log(`   File size: ${fileContent.length} characters`);
+                    
+                    // Extract project name from filename
                     const projectName = file.split('.')[0].toLowerCase();
+                    console.log(`   Project name from filename: ${projectName}`);
                     
-                    console.log(`🔍 Processing config: ${file} -> ${projectName}`);
+                    // Try different parsing strategies
+                    console.log(`   🔧 Attempting to parse config...`);
                     
-                    // Extract config using regex (simple approach for TypeScript)
-                    let config = {};
+                    // Strategy 1: Try to require the module (for .js files)
+                    let config = null;
                     
-                    // Try to extract the config object
-                    const configMatch = fileContent.match(/export\s+const\s+\w+Config\s*=\s*({[\s\S]*?});/);
-                    if (configMatch) {
+                    if (file.endsWith('.js')) {
                         try {
-                            // Clean the string to make it valid JSON
-                            let jsonStr = configMatch[1]
-                                .replace(/\/\/.*$/gm, '') // Remove comments
-                                .replace(/'/g, '"')       // Replace single quotes with double quotes
-                                .replace(/(\w+):/g, '"$1":') // Add quotes to property names
-                                .replace(/,\s*}/g, '}')   // Remove trailing commas
-                                .replace(/,\s*]/g, ']');  // Remove trailing commas in arrays
-                            
-                            config = JSON.parse(jsonStr);
-                        } catch (parseError) {
-                            console.error(`❌ Error parsing JSON for ${projectName}:`, parseError.message);
-                            // Fallback: extract individual values
-                            const baseURLMatch = fileContent.match(/baseURL:\s*['"]([^'"]+)['"]/);
-                            const nameMatch = fileContent.match(/name:\s*['"]([^'"]+)['"]/);
-                            const usernameMatch = fileContent.match(/username:\s*['"]([^'"]+)['"]/);
-                            const passwordMatch = fileContent.match(/password:\s*['"]([^'"]+)['"]/);
-                            
-                            if (baseURLMatch) {
-                                config = {
-                                    name: nameMatch ? nameMatch[1] : projectName.charAt(0).toUpperCase() + projectName.slice(1),
-                                    baseURL: baseURLMatch[1],
-                                    credentials: {
-                                        username: usernameMatch ? usernameMatch[1] : 'admin',
-                                        password: passwordMatch ? passwordMatch[1] : 'password'
-                                    }
-                                };
+                            delete require.cache[require.resolve(configPath)];
+                            config = require(configPath);
+                            console.log(`   ✅ Successfully required JS module`);
+                        } catch (requireError) {
+                            console.log(`   ❌ Could not require module: ${requireError.message}`);
+                        }
+                    }
+                    
+                    // Strategy 2: Parse TypeScript config (regex approach)
+                    if (!config) {
+                        console.log(`   🔍 Trying regex parsing for TypeScript...`);
+                        
+                        // Look for export patterns
+                        const exportPatterns = [
+                            /export\s+(?:const|let|var)\s+(\w+)\s*=\s*({[\s\S]*?});/g,
+                            /export\s+default\s*({[\s\S]*?});/g,
+                            /module\.exports\s*=\s*({[\s\S]*?});/g
+                        ];
+                        
+                        let matchFound = null;
+                        for (const pattern of exportPatterns) {
+                            const matches = [...fileContent.matchAll(pattern)];
+                            if (matches.length > 0) {
+                                matchFound = matches[0];
+                                console.log(`   ✅ Found export pattern match`);
+                                break;
+                            }
+                        }
+                        
+                        if (matchFound) {
+                            try {
+                                // Clean the string to make it valid JSON
+                                let jsonStr = matchFound[1] || matchFound[0];
+                                
+                                // Remove TypeScript type annotations
+                                jsonStr = jsonStr.replace(/:\s*\w+(\[\])?(?=\s*[,}])/g, '');
+                                jsonStr = jsonStr.replace(/\/\/.*$/gm, '');
+                                jsonStr = jsonStr.replace(/\/\*[\s\S]*?\*\//g, '');
+                                
+                                // Fix property names
+                                jsonStr = jsonStr.replace(/(\w+):/g, '"$1":');
+                                
+                                // Fix string values
+                                jsonStr = jsonStr.replace(/['"]([^'"]+)['"]/g, '"$1"');
+                                
+                                // Remove trailing commas
+                                jsonStr = jsonStr.replace(/,\s*}/g, '}');
+                                jsonStr = jsonStr.replace(/,\s*]/g, ']');
+                                
+                                console.log(`   🧹 Cleaned JSON string: ${jsonStr.substring(0, 200)}...`);
+                                
+                                config = JSON.parse(jsonStr);
+                                console.log(`   ✅ Successfully parsed JSON`);
+                            } catch (parseError) {
+                                console.log(`   ❌ JSON parse error: ${parseError.message}`);
+                                
+                                // Fallback: extract individual values
+                                console.log(`   🔍 Falling back to regex value extraction...`);
+                                
+                                const baseURLMatch = fileContent.match(/baseURL:\s*['"]([^'"]+)['"]/);
+                                const nameMatch = fileContent.match(/name:\s*['"]([^'"]+)['"]/);
+                                const usernameMatch = fileContent.match(/username:\s*['"]([^'"]+)['"]/);
+                                const passwordMatch = fileContent.match(/password:\s*['"]([^'"]+)['"]/);
+                                
+                                if (baseURLMatch || nameMatch) {
+                                    config = {
+                                        name: nameMatch ? nameMatch[1] : projectName.charAt(0).toUpperCase() + projectName.slice(1),
+                                        baseURL: baseURLMatch ? baseURLMatch[1] : 'http://localhost:8080/',
+                                        credentials: {
+                                            username: usernameMatch ? usernameMatch[1] : 'admin',
+                                            password: passwordMatch ? passwordMatch[1] : 'password'
+                                        }
+                                    };
+                                    console.log(`   ✅ Extracted values via regex`);
+                                }
                             }
                         }
                     }
                     
-                    if (config && config.baseURL) {
+                    // Strategy 3: Look for specific project patterns
+                    if (!config) {
+                        console.log(`   🔍 Looking for project-specific patterns...`);
+                        
+                        // Try to extract any object that looks like a config
+                        const objectMatch = fileContent.match(/{[\s\S]*?baseURL[\s\S]*?}/);
+                        if (objectMatch) {
+                            console.log(`   ⚠️ Found potential config object but parsing failed`);
+                        }
+                    }
+                    
+                    if (config && (config.baseURL || config.name)) {
                         projects[projectName] = {
                             name: config.name || projectName.charAt(0).toUpperCase() + projectName.slice(1),
-                            baseURL: config.baseURL,
+                            baseURL: config.baseURL || 'http://localhost:8080/',
                             credentials: config.credentials || {
                                 username: 'admin',
                                 password: 'password'
                             },
-                            folder: projectName,
+                            folder: config.folder || projectName,
                             database: config.database,
                             firstTimeUser: config.credentials?.firstTimeUser,
                             firstTimePassword: config.credentials?.firstTimePassword,
                             configPath: configPath
                         };
-                        console.log(`✅ Loaded config for: ${projectName}`);
+                        console.log(`   ✅ SUCCESS: Loaded config for: ${projectName}`);
+                        console.log(`      Name: ${projects[projectName].name}`);
+                        console.log(`      URL: ${projects[projectName].baseURL}`);
+                        console.log(`      Folder: ${projects[projectName].folder}`);
+                    } else {
+                        console.log(`   ❌ FAILED: Could not extract config from ${file}`);
+                        console.log(`   📄 First 500 chars of file content:`);
+                        console.log(fileContent.substring(0, 500));
                     }
                 } catch (error) {
-                    console.error(`❌ Error processing ${file}:`, error.message);
+                    console.error(`   ❌ Error processing ${file}:`, error.message);
+                    console.error(error.stack);
                 }
             }
         }
     } catch (error) {
         console.error('❌ Error reading config directory:', error.message);
+        console.error(error.stack);
     }
+    
+    console.log(`\n📊 Loaded ${Object.keys(projects).length} projects:`);
+    console.log(Object.keys(projects).map(key => `  - ${key}: ${projects[key].name}`).join('\n'));
     
     // If no configs loaded, use fallback
     if (Object.keys(projects).length === 0) {
-        console.log('⚠️ Using fallback configurations');
+        console.log('\n⚠️ ⚠️ ⚠️ USING FALLBACK CONFIGURATIONS ⚠️ ⚠️ ⚠️');
+        console.log('This means the automatic config loading failed!');
+        console.log('Check the logs above to see what went wrong.\n');
+        
         projects['milkymist'] = {
             name: 'MilkyMist WMS',
             baseURL: 'http://localhost:8016/',
@@ -135,13 +380,28 @@ function loadProjectsFromConfig() {
                 database: 'WMS_Pernord'
             }
         };
+        // projects['kkp'] = {
+        //     name: 'KKP',
+        //     baseURL: 'http://localhost:8016/',
+        //     credentials: {
+        //         username: 'admin',
+        //         password: 'admin123',
+        //         firstTimeUser: 'newuser',
+        //         firstTimePassword: 'TempPass@123'
+        //     },
+        //     folder: 'kkp',
+        //     database: {
+        //         server: 'localhost',
+        //         database: 'ASRS_KKP'
+        //     }
+        // };
     }
     
-    console.log(`📊 Total projects loaded: ${Object.keys(projects).length}`);
+    console.log(`\n🎯 FINAL: Total projects loaded: ${Object.keys(projects).length}`);
     return projects;
 }
 
-// Load projects
+
 const PROJECTS = loadProjectsFromConfig();
 
 // Test results history

@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import { MilkyMistConfig } from './configs/MilkyMist.config';
 import { PernordConfig } from './configs/Pernord.config';
+import { KKPConfig } from './configs/KKP.config';
 
 export default defineConfig({
   testDir: './tests',
@@ -19,7 +20,6 @@ export default defineConfig({
   },
 
   projects: [
-    // MilkyMist Projects
     {
       name: 'milkymist-chrome',
       testDir: './tests/MilkyMist',
@@ -28,16 +28,18 @@ export default defineConfig({
         baseURL: MilkyMistConfig.baseURL,
       },
     },
-    {
-      name: 'milkymist-firefox',
-      testDir: './tests/MilkyMist',
-      use: { 
-        ...devices['Desktop Firefox'],
-        baseURL: MilkyMistConfig.baseURL,
-      },
-    },
 
-    // Pernord Projects
+      // == Currently Firefox Browser Disbabled == Thirumalvasan
+
+    // {
+    //   name: 'milkymist-firefox',
+    //   testDir: './tests/MilkyMist',
+    //   use: { 
+    //     ...devices['Desktop Firefox'],
+    //     baseURL: MilkyMistConfig.baseURL,
+    //   },
+    // },
+
     {
       name: 'pernord-chrome',
       testDir: './tests/Pernord',
@@ -46,13 +48,35 @@ export default defineConfig({
         baseURL: PernordConfig.baseURL,
       },
     },
+
+    // == Currently Firefox Browser Disbabled == Thirumalvasan
+
+    // {
+    //   name: 'pernord-firefox',
+    //   testDir: './tests/Pernord',
+    //   use: { 
+    //     ...devices['Desktop Firefox'],
+    //     baseURL: PernordConfig.baseURL,
+    //   },
+    // },
     {
-      name: 'pernord-firefox',
-      testDir: './tests/Pernord',
+      name: 'kkp-chrome',
+      testDir: './tests/KKP',
       use: { 
-        ...devices['Desktop Firefox'],
-        baseURL: PernordConfig.baseURL,
+        ...devices['Desktop Chrome'],
+        baseURL: KKPConfig.baseURL,
       },
     },
+
+    // == Currently Firefox Browser Disbabled == Thirumalvasan
+
+    // {
+    //   name: 'kkp-firefox',
+    //   testDir: './tests/KKP',
+    //   use: { 
+    //     ...devices['Desktop Firefox'],
+    //     baseURL: KKPConfig.baseURL,
+    //   },
+    // },
   ],
 });

@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Playwright Web Dashboard</title>
+    <title>Craftsman ASRS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Modern Dashboard Theme - Same CSS as before */
+        /* Modern Dashboard Theme */
         :root {
             --primary: #667eea;
             --primary-dark: #5a67d8;
@@ -109,7 +110,7 @@
         }
 
         .nav-section {
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
 
         .nav-title {
@@ -127,7 +128,7 @@
         .nav-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 4px;
         }
 
         .nav-item {
@@ -158,11 +159,21 @@
         .nav-item i {
             width: 20px;
             font-size: 1.1rem;
+            flex-shrink: 0;
         }
 
         .nav-item span {
             flex: 1;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Sub-module styling */
+        .sub-module-item {
+            padding-left: 40px !important;
+            font-size: 0.875rem;
         }
 
         .badge {
@@ -170,6 +181,7 @@
             padding: 2px 8px;
             border-radius: 10px;
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .badge-success { background: var(--success); color: white; }
@@ -215,6 +227,223 @@
             margin-left: 280px;
             padding: 24px;
             min-height: 100vh;
+        }
+
+        /* Page Navigation */
+        .page-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: white;
+            padding: 12px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .page-nav-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: var(--gray-100);
+            color: var(--gray-700);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-nav-btn:hover {
+            background: var(--gray-200);
+            transform: translateY(-1px);
+        }
+
+        .page-nav-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        /* Dashboard Content */
+        .dashboard-content {
+            display: none;
+        }
+
+        .dashboard-content.active {
+            display: block;
+        }
+
+        /* Dashboard Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stats-card-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            opacity: 0.2;
+        }
+
+        .stats-card-content h3 {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .stats-card-content .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .stats-card-content .change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .change.positive {
+            color: var(--success);
+        }
+
+        .change.negative {
+            color: var(--danger);
+        }
+
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-card-header h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Recent Activity */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .activity-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .activity-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .activity-icon.success {
+            background: linear-gradient(135deg, var(--success), #0da674);
+        }
+
+        .activity-icon.warning {
+            background: linear-gradient(135deg, var(--warning), #e78b0c);
+        }
+
+        .activity-icon.danger {
+            background: linear-gradient(135deg, var(--danger), #e53e3e);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content h4 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .activity-content p {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--gray-400);
         }
 
         /* Top Bar */
@@ -480,6 +709,38 @@
         .btn-icon:hover {
             background: var(--primary);
             color: white;
+        }
+
+        /* Quick Run Options */
+        .quick-run-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .run-option-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+        }
+
+        .run-option-btn:hover {
+            background: var(--gray-200);
+            transform: translateX(4px);
+        }
+
+        .run-option-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         /* Console Output */
@@ -754,212 +1015,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Modals */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal {
-            background: white;
-            border-radius: var(--radius);
-            width: 600px;
-            max-width: 90vw;
-            max-height: 90vh;
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-        }
-
-        .modal-header {
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.25rem;
-        }
-
-        .modal-body {
-            padding: 24px;
-            overflow-y: auto;
-            max-height: calc(90vh - 140px);
-        }
-
-        .modal-footer {
-            padding: 20px;
-            background: var(--gray-100);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        /* Execution Options */
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .option-card {
-            padding: 20px;
-            border: 2px solid var(--gray-200);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            position: relative;
-        }
-
-        .option-card:hover {
-            border-color: var(--primary);
-            background: rgba(102, 126, 234, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .option-card.selected {
-            border-color: var(--primary);
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-        }
-
-        .option-card.selected::after {
-            content: "✓";
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 24px;
-            height: 24px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .option-icon {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 16px;
-            transition: var(--transition);
-        }
-
-        .option-card.selected .option-icon {
-            color: var(--secondary);
-        }
-
-        .option-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--dark);
-            font-size: 1rem;
-        }
-
-        .option-desc {
-            font-size: 0.875rem;
-            color: var(--gray-600);
-            line-height: 1.4;
-        }
-
-        .additional-options {
-            background: var(--gray-50);
-            padding: 20px;
-            border-radius: var(--radius);
-            margin-top: 20px;
-        }
-
-        .option-group {
-            margin-bottom: 20px;
-        }
-
-        .option-group:last-child {
-            margin-bottom: 0;
-        }
-
-        .option-group label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--gray-700);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .option-group input[type="number"] {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid var(--gray-200);
-            border-radius: 8px;
-            font-size: 0.875rem;
-            transition: var(--transition);
-        }
-
-        .option-group input[type="number"]:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        /* Checkbox styling */
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 12px 0;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .checkbox-container input[type="checkbox"] {
-            display: none;
-        }
-
-        .checkbox-custom {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--gray-300);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-
-        .checkbox-container input[type="checkbox"]:checked + .checkbox-custom {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-
-        .checkbox-container input[type="checkbox"]:checked + .checkbox-custom::after {
-            content: "✓";
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-        }
-
-        .checkbox-label {
-            font-weight: 500;
-            color: var(--gray-700);
-        }
-
         /* Responsive Design */
         @media (max-width: 1024px) {
             .sidebar {
@@ -988,7 +1043,16 @@
             .test-files-grid {
                 grid-template-columns: 1fr;
             }
-            .options-grid {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -1086,318 +1150,434 @@
 
         <!-- Main Content -->
         <div class="main-content">
-            <!-- Top Bar -->
-            <div class="top-bar">
-                <div class="breadcrumb">
-                    <div class="breadcrumb-item active" id="current-project-name">
-                        <i class="fas fa-warehouse"></i>
-                        <span>Loading...</span>
-                    </div>
-                    <div class="breadcrumb-separator">/</div>
-                    <div class="breadcrumb-item" id="current-module-name">
-                        <span>All Tests</span>
-                    </div>
-                </div>
-
-                <div class="top-actions">
-                    <span class="server-status">
-                        <i class="fas fa-circle text-success"></i>
-                        <span id="connection-status">Connected</span>
-                    </span>
-                    <button class="btn btn-outline" onclick="openReport()">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Report</span>
-                    </button>
-                    <button class="btn btn-primary" id="run-tests-btn" onclick="runTests()">
-                        <i class="fas fa-play"></i>
-                        <span>Run Tests</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Project Information -->
-            <div class="project-cards">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-info-circle"></i>
-                            Project Configuration
-                        </h3>
-                        <button class="btn-icon" onclick="refreshConfig()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="info-grid" id="project-info">
-                            <div class="info-item">
-                                <span class="info-label">
-                                    <i class="fas fa-globe"></i>
-                                    Base URL
-                                </span>
-                                <span class="info-value" id="info-baseurl">Loading...</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">
-                                    <i class="fas fa-user"></i>
-                                    Username
-                                </span>
-                                <span class="info-value" id="info-username">Loading...</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">
-                                    <i class="fas fa-database"></i>
-                                    Database
-                                </span>
-                                <span class="info-value" id="info-database">Loading...</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">
-                                    <i class="fas fa-folder"></i>
-                                    Test Folder
-                                </span>
-                                <span class="info-value" id="info-folder">Loading...</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-bolt"></i>
-                            Quick Actions
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="quick-actions">
-                            <div class="action-btn" onclick="runModule('login')">
-                                <i class="fas fa-sign-in-alt"></i>
-                                <span>Login Tests</span>
-                            </div>
-                            <div class="action-btn" onclick="runModule('changepassword')">
-                                <i class="fas fa-key"></i>
-                                <span>Change Password</span>
-                            </div>
-                            <div class="action-btn" onclick="openDebugMode()">
-                                <i class="fas fa-bug"></i>
-                                <span>Debug Mode</span>
-                            </div>
-                            <div class="action-btn" onclick="refreshDashboard()">
-                                <i class="fas fa-sync-alt"></i>
-                                <span>Refresh</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Test Files Section -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-file-code"></i>
-                        Test Files
-                    </h3>
-                    <div class="test-files-header">
-                        <div class="search-box">
-                            <i class="fas fa-search search-icon"></i>
-                            <input type="text" 
-                                   class="search-input" 
-                                   placeholder="Search test files..."
-                                   id="search-input"
-                                   oninput="filterTestFiles(this.value)">
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="test-files-grid" id="test-files-container">
-                        <div class="loading">Loading test files...</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Console Output -->
-            <div class="card console-container">
-                <div class="console-header">
-                    <h3 class="console-title">
-                        <i class="fas fa-terminal"></i>
-                        Execution Console
-                    </h3>
-                    <div class="console-controls">
-                        <span class="status-badge" id="execution-status">Idle</span>
-                        <button class="btn-icon" onclick="clearConsole()" title="Clear Console">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                        <button class="btn-icon" onclick="copyConsole()" title="Copy Console">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                        <button class="btn-icon" onclick="downloadConsole()" title="Download Console">
-                            <i class="fas fa-download"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="console-output" id="console-output">
-                    <div class="console-line info">🚀 Playwright Web Dashboard v3.0</div>
-                    <div class="console-line info">📡 Connected to server: http://localhost:5000</div>
-                    <div class="console-line info">💡 Select a test file to execute with options</div>
-                    <div class="console-line divider"></div>
-                </div>
-            </div>
-
-            <!-- Recent Executions -->
-            <div class="card recent-executions">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-history"></i>
-                        Recent Executions
-                    </h3>
-                    <button class="btn btn-secondary" onclick="clearHistory()">
-                        <i class="fas fa-trash"></i>
-                        Clear History
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div class="executions-grid" id="recent-executions-grid">
-                        <div class="execution-card">
-                            <div class="execution-header">
-                                <span class="execution-time">--:--:--</span>
-                                <span class="execution-status badge-success">✓</span>
-                            </div>
-                            <div class="execution-project">No executions yet</div>
-                            <div class="execution-details">Run some tests to see results here</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="footer">
-                <div class="server-info">
-                    <div class="server-info-item">
-                        <i class="fas fa-server"></i>
-                        <span>Server: http://localhost:5000</span>
-                    </div>
-                    <div class="server-info-item">
-                        <i class="fas fa-clock"></i>
-                        <span>Last Updated: <span id="last-updated">--:--:--</span></span>
-                    </div>
-                    <div class="server-info-item">
-                        <i class="fas fa-microchip"></i>
-                        <span>Tests: <span id="total-tests-footer">0</span></span>
-                    </div>
-                </div>
-                <div class="copyright">
-                    © <span id="currentYear"></span> WMS Testing Dashboard - Prepared by "Software Testing Team" | Craftsman Automation Limited
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Execution Options Modal -->
-    <div class="modal-overlay" id="execution-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modal-title">Execution Options</h3>
-                <button class="btn-icon" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
+            <!-- Page Navigation -->
+            <div class="page-nav">
+                <button class="page-nav-btn active" onclick="switchPage('dashboard')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="page-nav-btn" onclick="switchPage('testing')">
+                    <i class="fas fa-vial"></i>
+                    <span>Test Runner</span>
+                </button>
+                <button class="page-nav-btn" onclick="switchPage('reports')">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <div class="options-grid" id="execution-options">
-                    <div class="option-card" data-option="headed" onclick="selectOption(this, 'headed')">
-                        <div class="option-icon">
-                            <i class="fas fa-desktop"></i>
+
+            <!-- Dashboard Page -->
+            <div class="dashboard-content active" id="dashboard-page">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stats-card">
+                        <div class="stats-card-icon" style="background: rgba(102, 126, 234, 0.1); color: var(--primary);">
+                            <i class="fas fa-project-diagram"></i>
                         </div>
-                        <div class="option-title">Headed Mode</div>
-                        <div class="option-desc">
-                            Run tests with visible browser window. Good for debugging visual issues.
+                        <div class="stats-card-content">
+                            <h3>Total Projects</h3>
+                            <div class="value" id="dashboard-total-projects">0</div>
+                            <div class="change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Active</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="option-card" data-option="debug" onclick="selectOption(this, 'debug')">
-                        <div class="option-icon">
-                            <i class="fas fa-bug"></i>
-                        </div>
-                        <div class="option-title">Debug Mode</div>
-                        <div class="option-desc">
-                            Run with debugger, opens browser dev tools. Best for step-by-step debugging.
-                        </div>
-                    </div>
-                    <div class="option-card" data-option="ui" onclick="selectOption(this, 'ui')">
-                        <div class="option-icon">
-                            <i class="fas fa-sliders-h"></i>
-                        </div>
-                        <div class="option-title">Playwright UI</div>
-                        <div class="option-desc">
-                            Use Playwright's interactive test runner UI. Best for development.
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="additional-options">
-                    <div class="option-group">
-                        <label>
-                            <i class="fas fa-clock"></i>
-                            Timeout (seconds)
-                        </label>
-                        <input type="number" 
-                               id="timeout-input" 
-                               class="w-full" 
-                               placeholder="600" 
-                               value="600"
-                               min="30"
-                               max="3600">
                     </div>
                     
-                    <div class="option-group">
-                        <label>Additional Options</label>
-                        <div class="checkbox-container">
-                            <input type="checkbox" id="option-retry" class="option-checkbox" data-option="retry">
-                            <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Retry on failure</span>
+                    <div class="stats-card">
+                        <div class="stats-card-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fas fa-file-code"></i>
                         </div>
-                        <div class="checkbox-container">
-                            <input type="checkbox" id="option-trace" class="option-checkbox" data-option="trace" checked>
-                            <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Record trace on failure</span>
+                        <div class="stats-card-content">
+                            <h3>Total Tests</h3>
+                            <div class="value" id="dashboard-total-tests">0</div>
+                            <div class="change positive">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Ready</span>
+                            </div>
                         </div>
-                        <div class="checkbox-container">
-                            <input type="checkbox" id="option-screenshot" class="option-checkbox" data-option="screenshot" checked>
-                            <span class="checkbox-custom"></span>
-                            <span class="checkbox-label">Take screenshot on failure</span>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <div class="stats-card-icon" style="background: rgba(245, 158, 11, 0.1); color: var(--warning);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stats-card-content">
+                            <h3>Today's Executions</h3>
+                            <div class="value" id="dashboard-today-executions">0</div>
+                            <div class="change positive">
+                                <i class="fas fa-play-circle"></i>
+                                <span>Running</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <div class="stats-card-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stats-card-content">
+                            <h3>Failed Tests</h3>
+                            <div class="value" id="dashboard-failed-tests">0</div>
+                            <div class="change negative">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Need Attention</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <h3>Test Execution Trend</h3>
+                            <select class="btn btn-secondary" id="trend-period">
+                                <option value="7">Last 7 Days</option>
+                                <option value="30" selected>Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="execution-trend-chart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-card-header">
+                            <h3>Test Results Distribution</h3>
+                            <select class="btn btn-secondary" id="distribution-period">
+                                <option value="day">Today</option>
+                                <option value="week" selected>This Week</option>
+                                <option value="month">This Month</option>
+                            </select>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="results-distribution-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-history"></i>
+                            Recent Activity
+                        </h3>
+                        <button class="btn btn-secondary" onclick="refreshDashboardData()">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-list" id="recent-activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon success">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <h4>System Initialized</h4>
+                                    <p>Playwright Dashboard is ready</p>
+                                </div>
+                                <div class="activity-time">Just now</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal()">
-                    <i class="fas fa-times"></i>
-                    Cancel
-                </button>
-                <button class="btn btn-primary" onclick="executeWithSelectedOptions()">
-                    <i class="fas fa-play"></i>
-                    Execute Test
-                </button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Execution Details Modal -->
-    <div class="modal-overlay" id="details-modal">
-        <div class="modal" style="max-width: 800px;">
-            <div class="modal-header">
-                <h3 id="details-title">Execution Details</h3>
-                <button class="btn-icon" onclick="closeDetailsModal()">
-                    <i class="fas fa-times"></i>
-                </button>
+            <!-- Testing Page -->
+            <div class="dashboard-content" id="testing-page">
+                <!-- Top Bar -->
+                <div class="top-bar">
+                    <div class="breadcrumb">
+                        <div class="breadcrumb-item active" id="current-project-name">
+                            <i class="fas fa-warehouse"></i>
+                            <span>Loading...</span>
+                        </div>
+                        <div class="breadcrumb-separator">/</div>
+                        <div class="breadcrumb-item" id="current-module-name">
+                            <span>All Tests</span>
+                        </div>
+                    </div>
+
+                    <div class="top-actions">
+                        <span class="server-status">
+                            <i class="fas fa-circle text-success"></i>
+                            <span id="connection-status">Connected</span>
+                        </span>
+                        <button class="btn btn-outline" onclick="openReport()">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Report</span>
+                        </button>
+                        <button class="btn btn-primary" id="run-tests-btn" onclick="runTests()">
+                            <i class="fas fa-play"></i>
+                            <span>Run Tests</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Project Information -->
+                <div class="project-cards">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-info-circle"></i>
+                                Project Configuration
+                            </h3>
+                            <button class="btn-icon" onclick="refreshConfig()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-grid" id="project-info">
+                                <div class="info-item">
+                                    <span class="info-label">
+                                        <i class="fas fa-globe"></i>
+                                        Base URL
+                                    </span>
+                                    <span class="info-value" id="info-baseurl">Loading...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">
+                                        <i class="fas fa-user"></i>
+                                        Username
+                                    </span>
+                                    <span class="info-value" id="info-username">Loading...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">
+                                        <i class="fas fa-database"></i>
+                                        Database
+                                    </span>
+                                    <span class="info-value" id="info-database">Loading...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">
+                                        <i class="fas fa-folder"></i>
+                                        Test Folder
+                                    </span>
+                                    <span class="info-value" id="info-folder">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-bolt"></i>
+                                Quick Actions
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-actions">
+                                <div class="action-btn" onclick="runModule('login')">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    <span>Login Tests</span>
+                                </div>
+                                <div class="action-btn" onclick="runModule('changepassword')">
+                                    <i class="fas fa-key"></i>
+                                    <span>Change Password</span>
+                                </div>
+                                <div class="action-btn" onclick="openDebugMode()">
+                                    <i class="fas fa-bug"></i>
+                                    <span>Debug Mode</span>
+                                </div>
+                                <div class="action-btn" onclick="refreshDashboard()">
+                                    <i class="fas fa-sync-alt"></i>
+                                    <span>Refresh</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Files Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-file-code"></i>
+                            Test Files
+                        </h3>
+                        <div class="test-files-header">
+                            <div class="search-box">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" 
+                                       class="search-input" 
+                                       placeholder="Search test files..."
+                                       id="search-input"
+                                       oninput="filterTestFiles(this.value)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="test-files-grid" id="test-files-container">
+                            <div class="loading">Loading test files...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Console Output -->
+                <div class="card console-container">
+                    <div class="console-header">
+                        <h3 class="console-title">
+                            <i class="fas fa-terminal"></i>
+                            Execution Console
+                        </h3>
+                        <div class="console-controls">
+                            <span class="status-badge" id="execution-status">Idle</span>
+                            <button class="btn-icon" onclick="clearConsole()" title="Clear Console">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                            <button class="btn-icon" onclick="copyConsole()" title="Copy Console">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="btn-icon" onclick="downloadConsole()" title="Download Console">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="console-output" id="console-output">
+                        <div class="console-line info">🚀 Playwright Web Dashboard v3.0</div>
+                        <div class="console-line info">📡 Connected to server: http://localhost:5000</div>
+                        <div class="console-line info">💡 Select a test file to execute with options</div>
+                        <div class="console-line divider"></div>
+                    </div>
+                </div>
+
+                <!-- Recent Executions -->
+                <div class="card recent-executions">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-history"></i>
+                            Recent Executions
+                        </h3>
+                        <button class="btn btn-secondary" onclick="clearHistory()">
+                            <i class="fas fa-trash"></i>
+                            Clear History
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="executions-grid" id="recent-executions-grid">
+                            <div class="execution-card">
+                                <div class="execution-header">
+                                    <span class="execution-time">--:--:--</span>
+                                    <span class="execution-status badge-success">✓</span>
+                                </div>
+                                <div class="execution-project">No executions yet</div>
+                                <div class="execution-details">Run some tests to see results here</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="footer">
+                    <div class="server-info">
+                        <div class="server-info-item">
+                            <i class="fas fa-server"></i>
+                            <span>Server: http://localhost:5000</span>
+                        </div>
+                        <div class="server-info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Last Updated: <span id="last-updated">--:--:--</span></span>
+                        </div>
+                        <div class="server-info-item">
+                            <i class="fas fa-microchip"></i>
+                            <span>Tests: <span id="total-tests-footer">0</span></span>
+                        </div>
+                    </div>
+                    <div class="copyright">
+                        © <span id="currentYear"></span> WMS Testing Dashboard - Prepared by "Software Testing Team" | Craftsman Automation Limited
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <div class="info-grid mb-4" id="execution-details-info"></div>
-                <div class="console-output-small" id="execution-details-console"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" onclick="closeDetailsModal()">
-                    Close
-                </button>
+
+            <!-- Reports Page -->
+            <div class="dashboard-content" id="reports-page">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-bar"></i>
+                            Test Reports & Analytics
+                        </h3>
+                        <button class="btn btn-primary" onclick="generateReport()">
+                            <i class="fas fa-file-export"></i>
+                            Generate Report
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">
+                                    <i class="fas fa-calendar"></i>
+                                    Report Period
+                                </span>
+                                <select class="info-value" id="report-period" style="border: 1px solid var(--gray-300); padding: 8px; border-radius: 6px;">
+                                    <option value="today">Today</option>
+                                    <option value="week">This Week</option>
+                                    <option value="month" selected>This Month</option>
+                                    <option value="quarter">This Quarter</option>
+                                    <option value="year">This Year</option>
+                                </select>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">
+                                    <i class="fas fa-file"></i>
+                                    Report Format
+                                </span>
+                                <select class="info-value" id="report-format" style="border: 1px solid var(--gray-300); padding: 8px; border-radius: 6px;">
+                                    <option value="html" selected>HTML</option>
+                                    <option value="json">JSON</option>
+                                    <option value="csv">CSV</option>
+                                    <option value="pdf">PDF</option>
+                                </select>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">
+                                    <i class="fas fa-filter"></i>
+                                    Filter by Status
+                                </span>
+                                <select class="info-value" id="report-status" style="border: 1px solid var(--gray-300); padding: 8px; border-radius: 6px;">
+                                    <option value="all">All Tests</option>
+                                    <option value="passed">Passed Only</option>
+                                    <option value="failed">Failed Only</option>
+                                    <option value="skipped">Skipped Only</option>
+                                </select>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">
+                                    <i class="fas fa-project-diagram"></i>
+                                    Project
+                                </span>
+                                <select class="info-value" id="report-project" style="border: 1px solid var(--gray-300); padding: 8px; border-radius: 6px;">
+                                    <option value="all">All Projects</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container" style="height: 400px; margin-top: 24px;">
+                            <canvas id="report-chart"></canvas>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button class="btn btn-success" onclick="downloadReport()">
+                                <i class="fas fa-download"></i>
+                                Download Report
+                            </button>
+                            <button class="btn btn-info ml-2" onclick="viewReport()">
+                                <i class="fas fa-eye"></i>
+                                View in Browser
+                            </button>
+                            <button class="btn btn-secondary ml-2" onclick="emailReport()">
+                                <i class="fas fa-envelope"></i>
+                                Email Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1419,22 +1599,24 @@
             constructor() {
                 this.currentProject = null;
                 this.currentModule = 'all';
+                this.currentSubModule = null;
                 this.testFiles = [];
                 this.modules = ['all'];
+                this.subModules = new Map();
+                this.expandedModules = new Set();
                 this.projects = {};
                 this.executions = [];
-                this.selectedTestFileIndex = null;
-                this.selectedTestFile = null;
-                this.selectedOptions = {
-                    headed: false,
-                    debug: false,
-                    ui: false,
-                    timeout: 600,
-                    trace: true,
-                    screenshot: true,
-                    retry: false
-                };
                 this.isRunning = false;
+                this.dashboardData = {
+                    totalProjects: 0,
+                    totalTests: 0,
+                    todayExecutions: 0,
+                    failedTests: 0,
+                    trendData: [],
+                    distributionData: [],
+                    recentActivity: []
+                };
+                this.charts = {};
                 
                 this.init();
             }
@@ -1448,6 +1630,8 @@
                 await this.loadProjects();
                 this.setupEventListeners();
                 this.startConnectionCheck();
+                this.setupDashboardCharts();
+                this.loadDashboardData();
                 
                 // Set default project if none selected
                 if (!this.currentProject && Object.keys(this.projects).length > 0) {
@@ -1473,6 +1657,7 @@
                     
                     if (Object.keys(this.projects).length > 0) {
                         this.updateProjectList();
+                        this.updateDashboardStats();
                         
                         // Set first project as current if not set
                         if (!this.currentProject) {
@@ -1497,7 +1682,7 @@
                 projectList.innerHTML = Object.entries(this.projects).map(([key, config]) => `
                     <div class="nav-item ${key === this.currentProject ? 'active' : ''}" 
                          data-project="${key}"
-                         onclick="dashboard.selectProject('${key}')">
+                         onclick="window.dashboard.selectProject('${key}')">
                         <i class="fas ${key === 'milkymist' ? 'fa-warehouse' : 'fa-building'}"></i>
                         <span>${config.name}</span>
                         <span class="badge badge-success">Ready</span>
@@ -1505,6 +1690,7 @@
                 `).join('');
                 
                 document.getElementById('total-projects').textContent = Object.keys(this.projects).length;
+                document.getElementById('dashboard-total-projects').textContent = Object.keys(this.projects).length;
             }
             
             async selectProject(projectKey) {
@@ -1520,9 +1706,10 @@
                 
                 this.currentProject = projectKey;
                 this.currentModule = 'all';
-                this.selectedTestFileIndex = null;
-                this.selectedTestFile = null;
+                this.currentSubModule = null;
                 this.testFiles = [];
+                this.subModules = new Map();
+                this.expandedModules = new Set();
                 
                 // Update UI
                 document.querySelectorAll('.nav-item[data-project]').forEach(item => {
@@ -1540,30 +1727,45 @@
                 `;
                 
                 this.updateProjectInfo();
-                await this.loadModules();
+                await this.extractModulesAndSubModules();
+                this.renderModules();
                 await this.loadTestFiles();
                 this.clearConsole();
                 
                 this.logToConsole('info', `📁 Project switched to: ${projectConfig.name}`);
             }
             
-            async loadModules() {
+            async extractModulesAndSubModules() {
                 try {
                     if (!this.currentProject) return;
                     
-                    const response = await fetch(`/api/project-modules?project=${this.currentProject}`);
-                    if (!response.ok) throw new Error('Failed to fetch modules');
+                    const response = await fetch(`/api/test-files?project=${this.currentProject}&module=all`);
+                    if (!response.ok) return;
                     
                     const data = await response.json();
-                    
-                    if (data.success) {
-                        this.modules = ['all', ...data.modules.filter(m => m !== 'all')];
-                        this.renderModules();
+                    if (data.success && data.files) {
+                        const modules = new Set(['all']);
+                        const subModulesMap = new Map();
+                        
+                        data.files.forEach(file => {
+                            const module = file.module || 'general';
+                            const subModule = file.subModule;
+                            
+                            modules.add(module.toLowerCase());
+                            
+                            if (subModule) {
+                                if (!subModulesMap.has(module)) {
+                                    subModulesMap.set(module, new Set());
+                                }
+                                subModulesMap.get(module).add(subModule.toLowerCase());
+                            }
+                        });
+                        
+                        this.modules = Array.from(modules);
+                        this.subModules = subModulesMap;
                     }
                 } catch (error) {
-                    console.error('Failed to load modules:', error);
-                    this.modules = ['all'];
-                    this.renderModules();
+                    console.error('Failed to extract modules:', error);
                 }
             }
             
@@ -1571,17 +1773,70 @@
                 const moduleList = document.getElementById('module-list');
                 if (!moduleList) return;
                 
-                moduleList.innerHTML = this.modules.map(module => `
-                    <div class="nav-item ${module === this.currentModule ? 'active' : ''}" 
-                         data-module="${module}"
-                         onclick="dashboard.selectModule('${module}')">
-                        <i class="fas ${this.getModuleIcon(module)}"></i>
-                        <span>${module === 'all' ? 'All Tests' : module.charAt(0).toUpperCase() + module.slice(1)}</span>
-                    </div>
-                `).join('');
+                let html = '';
                 
-                document.getElementById('current-module-name').textContent = 
-                    this.currentModule === 'all' ? 'All Tests' : this.currentModule.charAt(0).toUpperCase() + this.currentModule.slice(1);
+                // Add "All Tests" option
+                html += `
+                    <div class="nav-item ${this.currentModule === 'all' && !this.currentSubModule ? 'active' : ''}" 
+                         data-module="all"
+                         onclick="window.dashboard.selectModule('all', null)">
+                        <i class="fas fa-play"></i>
+                        <span>All Tests</span>
+                    </div>
+                `;
+                
+                // Add main modules
+                this.modules.forEach(module => {
+                    if (module === 'all') return;
+                    
+                    const hasSubModules = this.subModules.has(module) && this.subModules.get(module).size > 0;
+                    const isExpanded = this.expandedModules.has(module);
+                    const isActive = this.currentModule === module && !this.currentSubModule;
+                    
+                    html += `
+                        <div class="nav-item ${isActive ? 'active' : ''}" 
+                             data-module="${module}"
+                             onclick="window.dashboard.toggleModule('${module}')">
+                            <i class="fas ${this.getModuleIcon(module)}"></i>
+                            <span>${this.formatModuleName(module)}</span>
+                            ${hasSubModules ? 
+                                `<i class="fas ${isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'}" 
+                                    style="font-size: 0.75rem; margin-left: auto;"></i>` : ''}
+                        </div>
+                    `;
+                    
+                    // Add sub-modules if they exist and module is expanded
+                    if (hasSubModules && isExpanded) {
+                        const subModules = Array.from(this.subModules.get(module));
+                        subModules.forEach(subModule => {
+                            const isSubActive = this.currentModule === module && this.currentSubModule === subModule;
+                            html += `
+                                <div class="nav-item sub-module-item ${isSubActive ? 'active' : ''}" 
+                                     data-module="${module}"
+                                     data-submodule="${subModule}"
+                                     onclick="window.dashboard.selectModule('${module}', '${subModule}')">
+                                    <i class="fas fa-folder"></i>
+                                    <span>${this.formatModuleName(subModule)}</span>
+                                </div>
+                            `;
+                        });
+                    }
+                });
+                
+                moduleList.innerHTML = html;
+                
+                // Update breadcrumb
+                this.updateBreadcrumb();
+            }
+            
+            formatModuleName(moduleName) {
+                if (!moduleName) return '';
+                
+                // Convert from kebab-case or snake_case to Title Case with spaces
+                return moduleName
+                    .replace(/[-_]/g, ' ')
+                    .replace(/\b\w/g, char => char.toUpperCase())
+                    .trim();
             }
             
             getModuleIcon(module) {
@@ -1594,40 +1849,102 @@
                     'receiving': 'fa-truck-loading',
                     'shipping': 'fa-shipping-fast',
                     'warehouse': 'fa-warehouse',
-                    'general': 'fa-cogs'
+                    'general': 'fa-cogs',
+                    'user': 'fa-user',
+                    'role': 'fa-user-tag',
+                    'customer': 'fa-users',
+                    'supplier': 'fa-truck',
+                    'product': 'fa-box',
+                    'category': 'fa-tags',
+                    'order': 'fa-shopping-cart',
+                    'payment': 'fa-credit-card',
+                    'report': 'fa-chart-bar',
+                    'dashboard': 'fa-tachometer-alt'
                 };
                 return icons[module] || 'fa-folder';
             }
             
-            selectModule(module) {
+            toggleModule(module) {
                 if (this.isRunning) {
                     this.showToast('Cannot switch modules while tests are running', 'warning');
                     return;
                 }
                 
-                if (!this.modules.includes(module)) {
+                if (this.expandedModules.has(module)) {
+                    // If already expanded, collapse it
+                    this.expandedModules.delete(module);
+                } else {
+                    // Expand this module, collapse others
+                    this.expandedModules.clear();
+                    this.expandedModules.add(module);
+                }
+                
+                // Select the module (not a sub-module)
+                this.selectModule(module, null);
+                this.renderModules();
+            }
+            
+            selectModule(module, subModule = null) {
+                if (this.isRunning) {
+                    this.showToast('Cannot switch modules while tests are running', 'warning');
+                    return;
+                }
+                
+                if (!this.modules.includes(module) && module !== 'all') {
                     this.showError(`Module "${module}" not found`);
                     return;
                 }
                 
                 this.currentModule = module;
-                this.selectedTestFileIndex = null;
-                this.selectedTestFile = null;
+                this.currentSubModule = subModule;
+                
+                // If selecting a sub-module, ensure parent module is expanded
+                if (subModule && module !== 'all') {
+                    this.expandedModules.add(module);
+                }
                 
                 // Update UI
                 document.querySelectorAll('.nav-item[data-module]').forEach(item => {
                     item.classList.remove('active');
                 });
-                const moduleItem = document.querySelector(`[data-module="${module}"]`);
+                
+                // Find and activate the correct item
+                let selector = `[data-module="${module}"]`;
+                if (subModule) {
+                    selector += `[data-submodule="${subModule}"]`;
+                }
+                const moduleItem = document.querySelector(selector);
                 if (moduleItem) {
                     moduleItem.classList.add('active');
                 }
                 
-                document.getElementById('current-module-name').textContent = 
-                    module === 'all' ? 'All Tests' : module.charAt(0).toUpperCase() + module.slice(1);
+                // Update breadcrumb
+                this.updateBreadcrumb();
                 
+                // Re-render modules to show/hide sub-modules
+                this.renderModules();
                 this.loadTestFiles();
-                this.logToConsole('info', `📂 Module switched to: ${module}`);
+                
+                // Log the selection
+                let logText = 'All Tests';
+                if (this.currentModule !== 'all') {
+                    logText = this.formatModuleName(this.currentModule);
+                    if (this.currentSubModule) {
+                        logText += ` > ${this.formatModuleName(this.currentSubModule)}`;
+                    }
+                }
+                this.logToConsole('info', `📂 Selected: ${logText}`);
+            }
+            
+            updateBreadcrumb() {
+                let moduleText = 'All Tests';
+                if (this.currentModule !== 'all') {
+                    moduleText = this.formatModuleName(this.currentModule);
+                    if (this.currentSubModule) {
+                        moduleText += ` / ${this.formatModuleName(this.currentSubModule)}`;
+                    }
+                }
+                document.getElementById('current-module-name').textContent = moduleText;
             }
             
             updateProjectInfo() {
@@ -1638,7 +1955,7 @@
                 document.getElementById('info-baseurl').textContent = projectConfig.baseURL || 'Not set';
                 document.getElementById('info-username').textContent = projectConfig.credentials?.username || 'Not set';
                 document.getElementById('info-database').textContent = 
-                    projectConfig.database ? `${projectConfig.database.database || 'N/A'} (${projectConfig.database.server || 'N/A'})` : 'Not configured';
+                projectConfig.database ? `${projectConfig.database.database || 'N/A'} (${projectConfig.database.server || 'N/A'})` : 'Not configured';
                 document.getElementById('info-folder').textContent = projectConfig.folder || 'Not set';
             }
             
@@ -1648,7 +1965,13 @@
                     
                     this.showLoading('Loading test files...');
                     
-                    const url = `/api/test-files?project=${this.currentProject}${this.currentModule !== 'all' ? `&module=${this.currentModule}` : ''}`;
+                    // Build URL with module and sub-module filters
+                    let url = `/api/test-files?project=${this.currentProject}`;
+                    
+                    if (this.currentModule !== 'all') {
+                        url += `&module=${this.currentModule}`;
+                    }
+                    
                     const response = await fetch(url);
                     
                     if (!response.ok) {
@@ -1658,9 +1981,31 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        this.testFiles = data.files || [];
+                        let files = data.files || [];
+                        
+                        // Filter by sub-module on client side
+                        if (this.currentSubModule) {
+                            files = files.filter(file => {
+                                const fileSubModule = (file.subModule || '').toLowerCase();
+                                return fileSubModule === this.currentSubModule.toLowerCase();
+                            });
+                        }
+                        
+                        this.testFiles = files;
                         this.renderTestFiles();
                         this.updateTestCount();
+                        
+                        // Show message if no files found for current selection
+                        if (files.length === 0) {
+                            let message = 'No test files found';
+                            if (this.currentModule !== 'all') {
+                                message += ` for ${this.formatModuleName(this.currentModule)}`;
+                                if (this.currentSubModule) {
+                                    message += ` > ${this.formatModuleName(this.currentSubModule)}`;
+                                }
+                            }
+                            this.logToConsole('info', `📭 ${message}`);
+                        }
                     } else {
                         this.renderNoTestFiles(data.error || 'Failed to load test files');
                     }
@@ -1676,11 +2021,19 @@
                 const container = document.getElementById('test-files-container');
                 
                 if (!this.testFiles || this.testFiles.length === 0) {
+                    let message = 'No test files found';
+                    if (this.currentModule !== 'all') {
+                        message += ` for ${this.formatModuleName(this.currentModule)}`;
+                        if (this.currentSubModule) {
+                            message += ` > ${this.formatModuleName(this.currentSubModule)}`;
+                        }
+                    }
+                    
                     container.innerHTML = `
                         <div class="loading" style="grid-column: 1/-1; text-align: center; padding: 40px;">
                             <i class="fas fa-folder-open" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 16px;"></i>
-                            <h3>No test files found</h3>
-                            <p>Create test files in the project directory</p>
+                            <h3>${message}</h3>
+                            <p>${this.currentModule === 'all' ? 'Create test files in the project directory' : 'Try selecting a different module or sub-module'}</p>
                         </div>
                     `;
                     return;
@@ -1691,6 +2044,7 @@
                     const displayName = fileName.replace('.spec.ts', '').replace('.spec.js', '').replace('.test.ts', '').replace('.test.js', '');
                     const filePath = file.path || file.filepath || file.actualPath || '';
                     const module = file.module || 'unknown';
+                    const subModule = file.subModule || '';
                     
                     return `
                     <div class="test-file-card" data-file-index="${index}">
@@ -1698,32 +2052,26 @@
                             <div class="test-file-name">
                                 ${displayName}
                             </div>
-                            <div class="test-file-module">${module}</div>
+                            <div class="test-file-module">${this.formatModuleName(module)}${subModule ? ` > ${this.formatModuleName(subModule)}` : ''}</div>
                         </div>
                         <div class="test-file-path">${filePath}</div>
-                        <div class="test-file-actions">
-                            <button class="btn-icon" onclick="event.stopPropagation(); dashboard.quickRunTest(${index})" title="Quick Run">
+                        <div class="quick-run-options" id="quick-options-${index}">
+                            <div class="run-option-btn" onclick="window.dashboard.runTestWithOption(${index}, 'default')">
                                 <i class="fas fa-play"></i>
-                            </button>
-                            <button class="btn-icon" onclick="event.stopPropagation(); dashboard.viewTestDetails(${index})" title="View Details">
-                                <i class="fas fa-info-circle"></i>
-                            </button>
+                                <span>Default (Headless)</span>
+                            </div>
+                            <div class="run-option-btn" onclick="window.dashboard.runTestWithOption(${index}, 'headed')">
+                                <i class="fas fa-desktop"></i>
+                                <span>Headed Mode</span>
+                            </div>
+                            <div class="run-option-btn" onclick="window.dashboard.runTestWithOption(${index}, 'debug')">
+                                <i class="fas fa-bug"></i>
+                                <span>Debug Mode</span>
+                            </div>
                         </div>
                     </div>
                     `;
                 }).join('');
-                
-                // Add click event listeners for card clicks
-                container.querySelectorAll('.test-file-card').forEach(card => {
-                    card.addEventListener('click', (e) => {
-                        if (!e.target.closest('.btn-icon')) {
-                            const index = parseInt(card.getAttribute('data-file-index'));
-                            if (!isNaN(index)) {
-                                dashboard.openExecutionOptions(index);
-                            }
-                        }
-                    });
-                });
                 
                 this.updateTestCount();
             }
@@ -1735,7 +2083,7 @@
                         <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 16px;"></i>
                         <h3>${error || 'No test files found'}</h3>
                         <p>Create tests in your project directory</p>
-                        <button class="btn btn-primary mt-4" onclick="dashboard.loadTestFiles()">
+                        <button class="btn btn-primary mt-4" onclick="window.dashboard.loadTestFiles()">
                             <i class="fas fa-sync-alt"></i> Retry
                         </button>
                     </div>
@@ -1746,6 +2094,7 @@
                 const count = this.testFiles.length;
                 document.getElementById('total-tests').textContent = count;
                 document.getElementById('total-tests-footer').textContent = count;
+                document.getElementById('dashboard-total-tests').textContent = count;
             }
             
             filterTestFiles(searchTerm) {
@@ -1758,11 +2107,13 @@
                     const name = file.name || file.filename || '';
                     const path = file.path || file.filepath || file.actualPath || '';
                     const module = file.module || '';
+                    const subModule = file.subModule || '';
                     
                     const searchLower = searchTerm.toLowerCase();
                     return name.toLowerCase().includes(searchLower) ||
                            path.toLowerCase().includes(searchLower) ||
-                           module.toLowerCase().includes(searchLower);
+                           module.toLowerCase().includes(searchLower) ||
+                           subModule.toLowerCase().includes(searchLower);
                 });
                 
                 const container = document.getElementById('test-files-container');
@@ -1788,6 +2139,7 @@
                     const displayName = fileName.replace('.spec.ts', '').replace('.spec.js', '').replace('.test.ts', '').replace('.test.js', '');
                     const filePath = file.path || file.filepath || file.actualPath || '';
                     const module = file.module || 'unknown';
+                    const subModule = file.subModule || '';
                     
                     return `
                     <div class="test-file-card" data-file-index="${originalIndex}">
@@ -1795,141 +2147,34 @@
                             <div class="test-file-name">
                                 ${displayName}
                             </div>
-                            <div class="test-file-module">${module}</div>
+                            <div class="test-file-module">${this.formatModuleName(module)}${subModule ? ` > ${this.formatModuleName(subModule)}` : ''}</div>
                         </div>
                         <div class="test-file-path">${filePath}</div>
-                        <div class="test-file-actions">
-                            <button class="btn-icon" onclick="event.stopPropagation(); dashboard.quickRunTest(${originalIndex})" title="Quick Run">
+                        <div class="quick-run-options" id="quick-options-${originalIndex}">
+                            <div class="run-option-btn" onclick="window.dashboard.runTestWithOption(${originalIndex}, 'default')">
                                 <i class="fas fa-play"></i>
-                            </button>
-                            <button class="btn-icon" onclick="event.stopPropagation(); dashboard.viewTestDetails(${originalIndex})" title="View Details">
-                                <i class="fas fa-info-circle"></i>
-                            </button>
+                                <span>Default (Headless)</span>
+                            </div>
+                            <div class="run-option-btn" onclick="window.dashboard.runTestWithOption(${originalIndex}, 'headed')">
+                                <i class="fas fa-desktop"></i>
+                                <span>Headed Mode</span>
+                            </div>
+                            <div class="run-option-btn" onclick="window.dashboard.runTestWithOption(${originalIndex}, 'debug')">
+                                <i class="fas fa-bug"></i>
+                                <span>Debug Mode</span>
+                            </div>
                         </div>
                     </div>
                     `;
                 }).join('');
-                
-                // Add click event listeners for filtered cards
-                container.querySelectorAll('.test-file-card').forEach(card => {
-                    card.addEventListener('click', (e) => {
-                        if (!e.target.closest('.btn-icon')) {
-                            const index = parseInt(card.getAttribute('data-file-index'));
-                            if (!isNaN(index)) {
-                                dashboard.openExecutionOptions(index);
-                            }
-                        }
-                    });
-                });
             }
             
-            openExecutionOptions(fileIndex) {
+            // SIMPLE FUNCTION: Run test with specific option
+            async runTestWithOption(fileIndex, optionType) {
                 if (this.isRunning) {
                     this.showToast('Tests are already running!', 'warning');
                     return;
                 }
-                
-                if (fileIndex === null || fileIndex === undefined || 
-                    isNaN(fileIndex) || fileIndex < 0 || fileIndex >= this.testFiles.length) {
-                    this.showToast('Invalid test file selected', 'error');
-                    return;
-                }
-                
-                this.selectedTestFileIndex = fileIndex;
-                this.selectedTestFile = this.testFiles[fileIndex];
-                
-                if (!this.selectedTestFile) {
-                    this.showToast('Could not find test file details', 'error');
-                    return;
-                }
-                
-                const fileName = this.selectedTestFile.name || this.selectedTestFile.filename || 'Unknown Test';
-                const displayName = fileName.replace('.spec.ts', '').replace('.spec.js', '').replace('.test.ts', '').replace('.test.js', '');
-                
-                // Reset options UI
-                document.querySelectorAll('.option-card').forEach(card => {
-                    card.classList.remove('selected');
-                });
-                
-                // Reset checkbox options to defaults
-                document.getElementById('option-retry').checked = this.selectedOptions.retry;
-                document.getElementById('option-trace').checked = this.selectedOptions.trace;
-                document.getElementById('option-screenshot').checked = this.selectedOptions.screenshot;
-                
-                // Reset timeout
-                document.getElementById('timeout-input').value = this.selectedOptions.timeout || 600;
-                
-                // Update modal title
-                document.getElementById('modal-title').textContent = `Execute: ${displayName}`;
-                
-                // Show modal
-                document.getElementById('execution-modal').style.display = 'flex';
-                
-                this.logToConsole('info', `📄 Selected test file: ${displayName}`);
-                const filePath = this.selectedTestFile.path || this.selectedTestFile.filepath || this.selectedTestFile.actualPath || '';
-                if (filePath) {
-                    this.logToConsole('info', `📁 File path: ${filePath}`);
-                }
-            }
-            
-            selectOption(element, option) {
-                // Toggle selection
-                const isSelected = element.classList.contains('selected');
-                
-                // If clicking an already selected option, deselect it
-                if (isSelected) {
-                    element.classList.remove('selected');
-                    this.selectedOptions[option] = false;
-                } else {
-                    // For exclusive modes, deselect others
-                    if (option === 'ui' || option === 'debug' || option === 'headed') {
-                        document.querySelectorAll('.option-card').forEach(card => {
-                            if (card.getAttribute('data-option') !== option) {
-                                card.classList.remove('selected');
-                                const otherOption = card.getAttribute('data-option');
-                                if (['ui', 'debug', 'headed'].includes(otherOption)) {
-                                    this.selectedOptions[otherOption] = false;
-                                }
-                            }
-                        });
-                    }
-                    
-                    element.classList.add('selected');
-                    this.selectedOptions[option] = true;
-                    
-                    // If debug is selected, also select headed (since debug requires headed mode)
-                    if (option === 'debug') {
-                        this.selectedOptions.headed = true;
-                        const headedCard = document.querySelector('[data-option="headed"]');
-                        if (headedCard) {
-                            headedCard.classList.add('selected');
-                        }
-                    }
-                }
-            }
-            
-            executeWithSelectedOptions() {
-                if (this.selectedTestFileIndex === null || !this.selectedTestFile) {
-                    this.showToast('No test file selected', 'error');
-                    return;
-                }
-                
-                // Get timeout value
-                const timeoutInput = document.getElementById('timeout-input');
-                const timeout = timeoutInput ? parseInt(timeoutInput.value) : 600;
-                this.selectedOptions.timeout = isNaN(timeout) ? 600 : Math.max(30, Math.min(3600, timeout));
-                
-                // Get checkbox options
-                this.selectedOptions.retry = document.getElementById('option-retry').checked;
-                this.selectedOptions.trace = document.getElementById('option-trace').checked;
-                this.selectedOptions.screenshot = document.getElementById('option-screenshot').checked;
-                
-                this.closeModal();
-                this.runSpecificTest();
-            }
-            
-            quickRunTest(fileIndex) {
-                event.stopPropagation();
                 
                 if (fileIndex === null || fileIndex === undefined || 
                     isNaN(fileIndex) || fileIndex < 0 || fileIndex >= this.testFiles.length) {
@@ -1937,13 +2182,30 @@
                     return;
                 }
                 
-                this.selectedTestFileIndex = fileIndex;
-                this.selectedTestFile = this.testFiles[fileIndex];
+                const file = this.testFiles[fileIndex];
+                if (!file) {
+                    this.showToast('Test file not found', 'error');
+                    return;
+                }
                 
-                // Run with default options
-                const defaultOptions = {
-                    headed: false,
-                    debug: false,
+                const fileName = file.name || file.filename || 'Unknown Test';
+                const displayName = fileName.replace('.spec.ts', '').replace('.spec.js', '').replace('.test.ts', '').replace('.test.js', '');
+                
+                // Get file path for server
+                let filePathForServer = file.path || file.filepath || '';
+                
+                // Clean the file path
+                filePathForServer = this.cleanFilePathForServer(filePathForServer);
+                
+                if (!filePathForServer) {
+                    this.showToast('Could not determine file path for server', 'error');
+                    return;
+                }
+                
+                // Define options based on selected optionType
+                const options = {
+                    headed: optionType === 'headed' || optionType === 'debug',
+                    debug: optionType === 'debug',
                     ui: false,
                     timeout: 600,
                     trace: true,
@@ -1951,33 +2213,8 @@
                     retry: false
                 };
                 
-                this.runSpecificTest(defaultOptions);
-            }
-            
-            async runSpecificTest(customOptions = null) {
-                if (this.isRunning) {
-                    this.showToast('Tests are already running!', 'warning');
-                    return;
-                }
-                
-                if (this.selectedTestFileIndex === null || !this.selectedTestFile) {
-                    this.showToast('No test file selected', 'error');
-                    return;
-                }
-                
-                const options = customOptions || this.selectedOptions;
-                const file = this.selectedTestFile;
-                const fileName = file.name || file.filename || 'Unknown Test';
-                const displayName = fileName.replace('.spec.ts', '').replace('.spec.js', '').replace('.test.ts', '').replace('.test.js', '');
-                const filePath = file.path || file.filepath || file.actualPath || '';
-                
-                if (!filePath) {
-                    this.showToast('Test file path is empty', 'error');
-                    return;
-                }
-                
                 this.isRunning = true;
-                this.showLoading('Running tests...');
+                this.showLoading(`Running test in ${optionType} mode...`);
                 
                 const runBtn = document.getElementById('run-tests-btn');
                 runBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running...';
@@ -1989,25 +2226,18 @@
                 // Log execution options
                 this.logToConsole('info', '🚀 Starting test execution...');
                 this.logToConsole('info', `📄 Test file: ${displayName}`);
-                this.logToConsole('info', `📁 File path: ${filePath}`);
+                this.logToConsole('info', `📁 File path: ${filePathForServer}`);
                 this.logToConsole('info', `📂 Project: ${this.currentProject}`);
-                
-                if (options.headed) this.logToConsole('debug', '📱 Mode: Headed (Visible Browser)');
-                if (options.debug) this.logToConsole('debug', '🐛 Mode: Debug (Dev Tools)');
-                if (options.ui) this.logToConsole('debug', '🎨 Mode: Playwright UI');
-                if (options.timeout) this.logToConsole('debug', `⏰ Timeout: ${options.timeout}s`);
-                if (options.trace) this.logToConsole('debug', '📝 Trace: Recording on failure');
-                if (options.screenshot) this.logToConsole('debug', '📸 Screenshot: On failure');
-                if (options.retry) this.logToConsole('debug', '🔄 Retry: On failure');
+                this.logToConsole('info', `🎯 Mode: ${optionType}`);
                 
                 try {
                     const payload = {
                         project: this.currentProject,
-                        testFile: filePath,
+                        testFile: filePathForServer,
                         options: options
                     };
                     
-                    this.logToConsole('debug', `📤 Sending request to server: ${JSON.stringify(payload, null, 2)}`);
+                    this.logToConsole('debug', `📤 Sending request to server...`);
                     
                     const response = await fetch('/api/run-tests', {
                         method: 'POST',
@@ -2041,9 +2271,37 @@
                     runBtn.innerHTML = '<i class="fas fa-play"></i> Run Tests';
                     runBtn.disabled = false;
                     
-                    // Reload executions history
-                    setTimeout(() => this.loadExecutions(), 1000);
+                    // Reload executions history and dashboard data
+                    setTimeout(() => {
+                        this.loadExecutions();
+                        this.loadDashboardData();
+                    }, 1000);
                 }
+            }
+            
+            // Helper method to clean file paths for server
+            cleanFilePathForServer(filePath) {
+                if (!filePath) return filePath;
+                
+                let cleanedPath = filePath.replace(/\\/g, '/');
+                
+                // Remove "tests/" prefix if present
+                if (cleanedPath.startsWith('tests/')) {
+                    cleanedPath = cleanedPath.substring(6);
+                }
+                
+                // Remove project folder prefix if present (e.g., "milkymist/")
+                if (this.currentProject && cleanedPath.startsWith(`${this.currentProject}/`)) {
+                    cleanedPath = cleanedPath.substring(this.currentProject.length + 1);
+                }
+                
+                // Remove "tests/{project}/" pattern if present
+                const projectPattern = `tests/${this.currentProject}/`;
+                if (cleanedPath.startsWith(projectPattern)) {
+                    cleanedPath = cleanedPath.substring(projectPattern.length);
+                }
+                
+                return cleanedPath;
             }
             
             async runTests() {
@@ -2074,6 +2332,11 @@
                         project: this.currentProject,
                         module: this.currentModule
                     };
+                    
+                    // If we have a sub-module, include it in the payload
+                    if (this.currentSubModule) {
+                        payload.subModule = this.currentSubModule;
+                    }
                     
                     const response = await fetch('/api/run-tests', {
                         method: 'POST',
@@ -2106,13 +2369,17 @@
                     runBtn.innerHTML = '<i class="fas fa-play"></i> Run Tests';
                     runBtn.disabled = false;
                     
-                    setTimeout(() => this.loadExecutions(), 1000);
+                    setTimeout(() => {
+                        this.loadExecutions();
+                        this.loadDashboardData();
+                    }, 1000);
                 }
             }
             
             async runModule(moduleName) {
                 this.currentModule = moduleName;
-                this.selectModule(moduleName);
+                this.currentSubModule = null;
+                this.selectModule(moduleName, null);
                 await this.runTests();
             }
             
@@ -2212,7 +2479,7 @@
                 }
                 
                 container.innerHTML = this.executions.map(exec => `
-                    <div class="execution-card" onclick="dashboard.viewExecutionDetails('${exec.id}')">
+                    <div class="execution-card" onclick="window.dashboard.viewExecutionDetails('${exec.id}')">
                         <div class="execution-header">
                             <span class="execution-time">${new Date(exec.timestamp).toLocaleTimeString()}</span>
                             <span class="execution-status ${exec.success ? 'badge-success' : 'badge-danger'}">
@@ -2242,7 +2509,7 @@
                 }
                 
                 container.innerHTML = this.executions.slice(0, 3).map(exec => `
-                    <div class="nav-item" onclick="dashboard.viewExecutionDetails('${exec.id}')">
+                    <div class="nav-item" onclick="window.dashboard.viewExecutionDetails('${exec.id}')">
                         <i class="fas ${exec.success ? 'fa-check-circle text-success' : 'fa-times-circle text-danger'}"></i>
                         <span>${exec.project || 'Unknown'}</span>
                     </div>
@@ -2257,7 +2524,8 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        this.showExecutionDetails(data.log);
+                        this.showToast('Execution details loaded', 'info');
+                        this.logToConsole('info', `Viewing execution details for ID: ${executionId}`);
                     }
                 } catch (error) {
                     console.error('Failed to load execution details:', error);
@@ -2265,86 +2533,229 @@
                 }
             }
             
-            showExecutionDetails(log) {
-                const detailsInfo = document.getElementById('execution-details-info');
-                const detailsConsole = document.getElementById('execution-details-console');
-                const detailsTitle = document.getElementById('details-title');
-                
-                detailsTitle.textContent = `Execution: ${log.project || 'Unknown'}`;
-                
-                detailsInfo.innerHTML = `
-                    <div class="info-item">
-                        <span class="info-label">Project</span>
-                        <span class="info-value">${log.project || 'Unknown'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Time</span>
-                        <span class="info-value">${new Date(log.timestamp).toLocaleString()}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Status</span>
-                        <span class="info-value ${log.success ? 'text-success' : 'text-danger'}">
-                            ${log.success ? 'Passed' : 'Failed'}
-                        </span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Exit Code</span>
-                        <span class="info-value">${log.exitCode !== undefined ? log.exitCode : 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Test File</span>
-                        <span class="info-value">${log.testFile || 'N/A'}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Module</span>
-                        <span class="info-value">${log.module || 'N/A'}</span>
-                    </div>
-                `;
-                
-                let consoleHtml = '';
-                if (log.output) {
-                    const lines = log.output.split('\n');
-                    lines.forEach(line => {
-                        if (line.trim()) {
-                            if (line.includes('✓') || line.includes('passed') || line.includes('PASS')) {
-                                consoleHtml += `<div class="console-line success">${line}</div>`;
-                            } else if (line.includes('✗') || line.includes('failed') || line.includes('FAIL') || line.includes('Error') || line.includes('ERROR')) {
-                                consoleHtml += `<div class="console-line error">${line}</div>`;
-                            } else if (line.includes('warning') || line.includes('Warning') || line.includes('WARN')) {
-                                consoleHtml += `<div class="console-line warning">${line}</div>`;
-                            } else {
-                                consoleHtml += `<div class="console-line info">${line}</div>`;
+            // Dashboard Functions
+            setupDashboardCharts() {
+                // Execution Trend Chart
+                const trendCtx = document.getElementById('execution-trend-chart').getContext('2d');
+                this.charts.trend = new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Passed Tests',
+                            data: [],
+                            borderColor: 'rgb(16, 185, 129)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }, {
+                            label: 'Failed Tests',
+                            data: [],
+                            borderColor: 'rgb(239, 68, 68)',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Number of Tests'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
                             }
                         }
-                    });
-                }
+                    }
+                });
                 
-                detailsConsole.innerHTML = consoleHtml || '<div class="console-line info">No output available</div>';
+                // Results Distribution Chart
+                const distributionCtx = document.getElementById('results-distribution-chart').getContext('2d');
+                this.charts.distribution = new Chart(distributionCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Passed', 'Failed', 'Skipped', 'Pending'],
+                        datasets: [{
+                            data: [0, 0, 0, 0],
+                            backgroundColor: [
+                                'rgb(16, 185, 129)',
+                                'rgb(239, 68, 68)',
+                                'rgb(245, 158, 11)',
+                                'rgb(156, 163, 175)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                            },
+                            title: {
+                                display: false
+                            }
+                        }
+                    }
+                });
                 
-                document.getElementById('details-modal').style.display = 'flex';
+                // Report Chart
+                const reportCtx = document.getElementById('report-chart').getContext('2d');
+                this.charts.report = new Chart(reportCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Tests Executed',
+                            data: [12, 19, 3, 5, 2, 3, 7],
+                            backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                            borderColor: 'rgb(102, 126, 234)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
             }
             
-            viewTestDetails(fileIndex) {
-                event.stopPropagation();
+            async loadDashboardData() {
+                try {
+                    // Load executions for dashboard stats
+                    const response = await fetch('/api/executions?limit=100');
+                    if (!response.ok) return;
+                    
+                    const data = await response.json();
+                    if (data.success && data.logs) {
+                        const executions = data.logs;
+                        const today = new Date().toDateString();
+                        
+                        // Calculate today's executions
+                        const todayExecutions = executions.filter(exec => {
+                            const execDate = new Date(exec.timestamp).toDateString();
+                            return execDate === today;
+                        }).length;
+                        
+                        // Calculate failed tests (from recent executions)
+                        const failedTests = executions.filter(exec => !exec.success).length;
+                        
+                        // Update dashboard stats
+                        document.getElementById('dashboard-today-executions').textContent = todayExecutions;
+                        document.getElementById('dashboard-failed-tests').textContent = failedTests;
+                        
+                        // Update activity list
+                        this.updateActivityList(executions.slice(0, 5));
+                        
+                        // Generate sample trend data (in real app, fetch from API)
+                        this.generateSampleTrendData();
+                    }
+                } catch (error) {
+                    console.error('Failed to load dashboard data:', error);
+                }
+            }
+            
+            generateSampleTrendData() {
+                // Generate sample data for the last 30 days
+                const labels = [];
+                const passedData = [];
+                const failedData = [];
                 
-                if (fileIndex === null || fileIndex === undefined || 
-                    isNaN(fileIndex) || fileIndex < 0 || fileIndex >= this.testFiles.length) {
-                    this.showToast('Invalid test file', 'error');
+                for (let i = 29; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                    
+                    // Random sample data
+                    passedData.push(Math.floor(Math.random() * 50) + 20);
+                    failedData.push(Math.floor(Math.random() * 10) + 1);
+                }
+                
+                // Update trend chart
+                this.charts.trend.data.labels = labels;
+                this.charts.trend.data.datasets[0].data = passedData;
+                this.charts.trend.data.datasets[1].data = failedData;
+                this.charts.trend.update();
+                
+                // Update distribution chart with random data
+                this.charts.distribution.data.datasets[0].data = [
+                    Math.floor(Math.random() * 100) + 50,
+                    Math.floor(Math.random() * 20) + 5,
+                    Math.floor(Math.random() * 10) + 2,
+                    Math.floor(Math.random() * 5) + 1
+                ];
+                this.charts.distribution.update();
+            }
+            
+            updateActivityList(activities) {
+                const container = document.getElementById('recent-activity-list');
+                
+                if (!activities || activities.length === 0) {
+                    container.innerHTML = `
+                        <div class="activity-item">
+                            <div class="activity-icon warning">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4>No Recent Activity</h4>
+                                <p>Run some tests to see activity here</p>
+                            </div>
+                            <div class="activity-time">--:--</div>
+                        </div>
+                    `;
                     return;
                 }
                 
-                const file = this.testFiles[fileIndex];
-                if (!file) return;
-                
-                const fileName = file.name || file.filename || 'Unknown Test';
-                const displayName = fileName.replace('.spec.ts', '').replace('.spec.js', '').replace('.test.ts', '').replace('.test.js', '');
-                const filePath = file.path || file.filepath || file.actualPath || '';
-                const module = file.module || 'unknown';
-                
-                this.logToConsole('info', `📄 Test file details: ${displayName}`);
-                this.logToConsole('info', `📁 File path: ${filePath}`);
-                this.logToConsole('info', `📂 Module: ${module}`);
-                this.showToast('Test details logged to console', 'info');
+                container.innerHTML = activities.map(activity => {
+                    const time = new Date(activity.timestamp);
+                    const timeText = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const iconType = activity.success ? 'success' : 'danger';
+                    const icon = activity.success ? 'fa-check' : 'fa-times';
+                    const statusText = activity.success ? 'Passed' : 'Failed';
+                    const testName = activity.testFile === 'all' ? 'All Tests' : 
+                                   (activity.testFile || 'Unknown').split('/').pop().replace('.spec.ts', '').replace('.spec.js', '');
+                    
+                    return `
+                    <div class="activity-item">
+                        <div class="activity-icon ${iconType}">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <h4>${testName} - ${statusText}</h4>
+                            <p>${activity.project || 'Unknown'} • ${activity.module || 'All Tests'}</p>
+                        </div>
+                        <div class="activity-time">${timeText}</div>
+                    </div>
+                    `;
+                }).join('');
+            }
+            
+            updateDashboardStats() {
+                document.getElementById('dashboard-total-projects').textContent = Object.keys(this.projects).length;
+                document.getElementById('dashboard-total-tests').textContent = this.testFiles.length;
             }
             
             logToConsole(type, message) {
@@ -2394,9 +2805,7 @@
                 
                 // Find a test file for debug mode
                 if (this.testFiles.length > 0) {
-                    this.selectedTestFileIndex = 0;
-                    this.selectedTestFile = this.testFiles[0];
-                    this.runSpecificTest({ debug: true, headed: true });
+                    this.runTestWithOption(0, 'debug');
                 } else {
                     this.showToast('No test files found for debug mode', 'warning');
                 }
@@ -2409,10 +2818,16 @@
             
             async refreshDashboard() {
                 await this.loadProjects();
-                await this.loadModules();
+                await this.extractModulesAndSubModules();
+                this.renderModules();
                 await this.loadTestFiles();
                 await this.loadExecutions();
                 this.showToast('Dashboard refreshed!', 'success');
+            }
+            
+            async refreshDashboardData() {
+                await this.loadDashboardData();
+                this.showToast('Dashboard data refreshed!', 'success');
             }
             
             async clearHistory() {
@@ -2471,16 +2886,6 @@
                 }
             }
             
-            closeModal() {
-                document.getElementById('execution-modal').style.display = 'none';
-                this.selectedTestFileIndex = null;
-                this.selectedTestFile = null;
-            }
-            
-            closeDetailsModal() {
-                document.getElementById('details-modal').style.display = 'none';
-            }
-            
             setupEventListeners() {
                 // Global keyboard shortcuts
                 document.addEventListener('keydown', (e) => {
@@ -2492,20 +2897,16 @@
                             searchInput.select();
                         }
                     }
-                    if (e.key === 'Escape') {
-                        this.closeModal();
-                        this.closeDetailsModal();
-                    }
                 });
                 
-                // Add click handlers for checkboxes
-                document.querySelectorAll('.option-checkbox').forEach(checkbox => {
-                    checkbox.addEventListener('change', (e) => {
-                        const option = e.target.getAttribute('data-option');
-                        if (option && this.selectedOptions.hasOwnProperty(option)) {
-                            this.selectedOptions[option] = e.target.checked;
-                        }
-                    });
+                // Trend period change
+                document.getElementById('trend-period').addEventListener('change', (e) => {
+                    this.generateSampleTrendData();
+                });
+                
+                // Distribution period change
+                document.getElementById('distribution-period').addEventListener('change', (e) => {
+                    this.generateSampleTrendData();
                 });
             }
             
@@ -2551,6 +2952,71 @@
                     statusIcon.className = 'fas fa-circle text-danger';
                 }
             }
+            
+            // Page switching function
+            switchPage(page) {
+                // Update navigation buttons
+                document.querySelectorAll('.page-nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                // Show selected page
+                document.querySelectorAll('.dashboard-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${page}-page`).classList.add('active');
+                
+                // Load data for the page if needed
+                if (page === 'dashboard') {
+                    this.loadDashboardData();
+                } else if (page === 'testing') {
+                    // Already loaded
+                } else if (page === 'reports') {
+                    // Update report project dropdown
+                    const reportProjectSelect = document.getElementById('report-project');
+                    reportProjectSelect.innerHTML = '<option value="all">All Projects</option>';
+                    Object.keys(this.projects).forEach(key => {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = this.projects[key].name;
+                        reportProjectSelect.appendChild(option);
+                    });
+                }
+            }
+            
+            // Report functions
+            generateReport() {
+                this.showToast('Generating report...', 'info');
+                // In a real implementation, this would call an API endpoint
+                setTimeout(() => {
+                    this.showToast('Report generated successfully!', 'success');
+                }, 2000);
+            }
+            
+            downloadReport() {
+                this.showToast('Downloading report...', 'info');
+                // In a real implementation, this would download the report
+                setTimeout(() => {
+                    this.showToast('Report downloaded!', 'success');
+                }, 1500);
+            }
+            
+            viewReport() {
+                this.showToast('Opening report in browser...', 'info');
+                // In a real implementation, this would open the report
+                setTimeout(() => {
+                    this.showToast('Report opened!', 'success');
+                }, 1000);
+            }
+            
+            emailReport() {
+                this.showToast('Sending report via email...', 'info');
+                // In a real implementation, this would email the report
+                setTimeout(() => {
+                    this.showToast('Report sent!', 'success');
+                }, 2000);
+            }
         }
         
         // Initialize dashboard when page loads
@@ -2585,11 +3051,13 @@
             window.refreshDashboard = () => dashboard.refreshDashboard();
             window.openDebugMode = () => dashboard.openDebugMode();
             window.clearHistory = () => dashboard.clearHistory();
-            window.closeModal = () => dashboard.closeModal();
-            window.selectOption = (element, option) => dashboard.selectOption(element, option);
-            window.executeWithSelectedOptions = () => dashboard.executeWithSelectedOptions();
-            window.closeDetailsModal = () => dashboard.closeDetailsModal();
             window.refreshConfig = () => dashboard.refreshConfig();
+            window.switchPage = (page) => dashboard.switchPage(page);
+            window.refreshDashboardData = () => dashboard.refreshDashboardData();
+            window.generateReport = () => dashboard.generateReport();
+            window.downloadReport = () => dashboard.downloadReport();
+            window.viewReport = () => dashboard.viewReport();
+            window.emailReport = () => dashboard.emailReport();
         });
     </script>
 </body>
